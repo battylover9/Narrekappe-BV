@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Features — Narrekappe Training Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+        <header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" href="index.html">Narrekappe<span class="accent">.</span></a>
+                <nav class="main-nav">
+                    <a href="index.html">Home</a>
+                    <a href="features.html">Features</a>
+                    <a href="training.html">Training</a>
+                    <a href="security.html">Security</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="user-portal.html">User Portal</a>
+                    <a href="admin-login.html">Admin Login</a>
+                </nav>
+                <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+            </div>
+</header>
+
+
+<main class="container">
+    <h1>Platform Features</h1>
+    <p class="muted">The platform is designed to simplify the delivery of labs, automate imports, and secure student environments.</p>
+
+
+    <section class="grid-3">
+        <div class="feature card">
+            <h3>Automated VM Import</h3>
+            <p>Download vulnerable machines from VulnHub automatically, verify artifacts, convert to templates, and import to the hypervisor with minimal admin effort.</p>
+            <ul>
+                <li>Checksum validation</li>
+                <li>Quarantine & verification</li>
+                <li>Template registration</li>
+            </ul>
+        </div>
+
+
+<div class="feature card">
+        <h3>Central Admin Console</h3>
+            <p>A single dashboard to create, start, stop, snapshot, and assign VMs to students.</p>
+            <ul>
+                <li>Student onboarding/offboarding</li>
+                <li>Role-based access</li>
+                <li>Activity logs & alerts</li>
+            </ul>
+</div>
+
+
+<div class="feature card">
+        <h3>Student Workspaces</h3>
+        <p>Each student gets an isolated workspace with difficulty tagging (easy / medium / hard) and automatic environment reset after exercises.</p>
+        <ul>
+            <li>Ephemeral storage for student sessions</li>
+            <li>Per-student VLANs / network segmentation</li>
+            <li>Pre-built challenges and hints</li>
+        </ul>
+</div>
+</section>
+
+
+<section class="card">
+        <h2>Scalability & Performance</h2>
+        <p>Design supports up to 30 students and 5 concurrent vulnerable VMs. Templates and automation scripts help keep import time under 10 minutes and VM boot times within 2–3 minutes.</p>
+</section>
+
+
+<section class="card">
+        <h2>Monitoring & Maintenance</h2>
+        <p>Basic resource monitoring (CPU, RAM, disk), weekly backups of templates/configuration, and a recovery plan with snapshots and logs.</p>
+</section>
+</main>
+
+
+<footer class="site-footer">
+        <div class="container footer-inner">
+        <p>© Narrekappe B.V.</p>
+        </div>
+</footer>
+
+<script src="app.js"></script>
+
+
+</body>
+</html>
+

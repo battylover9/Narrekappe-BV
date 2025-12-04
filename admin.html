@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Admin Console — Narrekappe Training Platform</title>
+        <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+<header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" href="index.html">Narrekappe<span class="accent">.</span></a>
+                <nav class="main-nav">
+                    <a href="index.html">Home</a>
+                    <a href="features.html">Features</a>
+                    <a href="training.html">Training</a>
+                    <a href="admin.html">Admin</a>
+                    <a href="security.html">Security</a>
+                    <a href="contact.html">Contact</a>
+                    <a href="user-portal.html">User Portal</a>
+                    <a href ="admin-dashboard.html">Dashboard</a>
+                    <a href="admin-login.html">Logout</a>
+                 </nav>
+                <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+            </div>
+</header>
+
+
+<main class="container">
+    <h1>Admin Dashboard Concept</h1>
+    <p class="muted">This page outlines the capabilities of the admin console — it is a conceptual mockup for the platform.</p>
+
+
+<section class="card">
+        <h2>User & Lab Management</h2>
+            <ul>
+                <li>Create / remove student accounts</li>
+                <li>Assign templates and start/stop/reset VMs</li>
+                <li>Set lab schedules and revoke access automatically</li>
+            </ul>
+</section>
+
+
+<section class="card">
+    <h2>Automation</h2>
+    <p>One-click import from a URL or repository. The system verifies checksums, converts images as needed, and registers templates for deployment.</p>
+</section>
+
+
+<section class="card">
+        <h2>Monitoring & Logs</h2>
+        <p>Overview of resource usage, alerts for failures, and logs for audit and grading.</p>
+                <div class="dashboard-sample">
+                <div class="dash-card">CPU: 45%</div>
+                <div class="dash-card">RAM: 63%</div>
+                <div class="dash-card">Storage: 72%</div>
+            </div>
+</section>
+
+
+<section class="card">
+        <h2>Maintenance</h2>
+        <p>Weekly backups of templates and configs, rollback via snapshots, and version-controlled scripts for reproducibility.</p>
+</section>
+</main>
+
+<h3>Create New User</h3>
+<input type="text" id="newUser" placeholder="Username">
+<input type="password" id="newPass" placeholder="Password">
+<select id="newRole">
+  <option value="user">User</option>
+  <option value="admin">Admin</option>
+</select>
+<button onclick="createUser()">Add User</button>
+
+<script>
+function createUser() {
+    const username = document.getElementById("newUser").value;
+    const password = document.getElementById("newPass").value;
+    const role = document.getElementById("newRole").value;
+
+    addUser(username, password, role);
+
+    document.getElementById("newUser").value = "";
+    document.getElementById("newPass").value = "";
+}
+</script>
+
+
+<footer class="site-footer">
+<div class="container footer-inner">
+<p>© Narrekappe B.V.</p>
+</div>
+</footer>
+
+<script src="app.js"></script>
+
+
+</body>
+</html>
+

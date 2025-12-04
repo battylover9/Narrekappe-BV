@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Security & Scalability — Narrekappe Training Platform</title>
+        <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+        <header class="site-header">
+            <div class="container header-inner">
+            <a class="brand" href="index.html">Narrekappe<span class="accent">.</span></a>
+                <nav class="main-nav">
+                    <a href="index.html">Home</a>
+                    <a href="features.html">Features</a>
+                    <a href="training.html">Training</a>
+                    <a href="security.html">Security</a>
+                    <a href="user-portal.html">User Portal</a>
+                    <a href="admin-login.html">Admin Login</a>
+                </nav>
+                <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+            </div>
+        </header>
+
+
+<main class="container">
+        <h1>Security Design</h1>
+        <p class="muted">Security measures and mitigations used to protect the company network and students during exercises.</p>
+
+
+<section class="card">
+        <h2>Network Isolation</h2>
+        <p>Each lab runs in isolated VLANs with strict firewall rules preventing access to internal networks. Only admin machines have controlled access to management interfaces.</p>
+</section>
+
+
+<section class="card">
+        <h2>Access Control & Authentication</h2>
+        <p>Role-based accounts for admins and students, strong password policies, encrypted credentials in transit (HTTPS) and at rest. Temporary credentials for student sessions that expire.</p>
+</section>
+
+
+<section class="card">
+        <h2>Automation Safety</h2>
+        <p>Downloaded VM images are validated via checksums, scanned in a quarantine environment, and only then imported as templates.</p>
+</section>
+
+
+<section class="card">
+        <h2>Backups & Recovery</h2>
+        <p>Weekly encrypted backups of templates and configurations, and snapshot-based rollback for corrupted VMs.</p>
+</section>
+</main>
+
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <p>© Narrekappe B.V.</p>
+    </div>
+</footer>
+
+<script src="app.js"></script>
+
+</body>
+</html>
+

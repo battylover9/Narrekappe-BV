@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Training — Narrekappe Training Platform</title>
+        <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+        <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html">Narrekappe<span class="accent">.</span></a>
+            <nav class="main-nav">
+                <a href="index.html">Home</a>
+                <a href="features.html">Features</a>
+                <a href="training.html">Training</a>
+                <a href="security.html">Security</a>
+                <a href="contact.html">Contact</a>
+                <a href="user-portal.html">User Portal</a>
+                <a href="admin-login.html">Admin Login</a>
+            </nav>
+            <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+        </div>
+</header>
+
+
+<main class="container">
+        <h1>Training Environment</h1>
+        <p class="muted">Student-facing guide to labs, connection instructions, and difficulty levels.</p>
+
+
+<section class="card">
+        <h2>How it works</h2>
+        <ol>
+            <li>Admin assigns a VM template (easy/medium/hard) to the student.</li>
+            <li>The platform deploys the VM in an isolated network and generates temporary credentials.</li>
+            <li>The student connects via HTTPS web-console or SSH (instructions shown in dashboard).</li>
+            <li>After the session ends, the lab resets to a clean snapshot.</li>
+        </ol>
+</section>
+
+
+<section class="grid-3">
+<div class="card">
+        <h3>Difficulty: Easy</h3>
+        <p>Introductory labs for beginners. Focus on reconnaissance, basic exploitation, and safe practice.</p>
+</div>
+<div class="card">
+        <h3>Difficulty: Medium</h3>
+        <p>Intermediate scenarios requiring chained exploits and basic pivoting inside the isolated lab.</p>
+</div>
+<div class="card">
+        <h3>Difficulty: Hard</h3>
+        <p>Advanced challenges with realistic post-exploitation tasks and deeper forensics.</p>
+</div>
+</section>
+
+
+<section class="card">
+        <h2>Student safety & rules</h2>
+        <ul>
+            <li>Do not attempt to reach company internal networks.</li>
+            <li>Use only assigned machines and follow exercise instructions.</li>
+            <li>All work is logged for safety and grading.</li>
+        </ul>
+</section>
+</main>
+
+
+<footer class="site-footer">
+        <div class="container footer-inner">
+             <p>© Narrekappe B.V.</p>
+        </div>
+</footer>
+<script src="app.js"></script>
+
+</body>
+</html>

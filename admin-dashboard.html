@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Admin Dashboard — Narrekappe Training Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+<header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html">Narrekappe<span class="accent">.</span></a>
+            <nav class="main-nav">
+                <a href="index.html">Home</a>
+                <a href="admin.html">Admin Info</a>
+                <a href="admin-login.html">Logout</a>
+            </nav>
+        </div>
+
+        <script>
+    if (localStorage.getItem("loggedIn") !== "yes") {
+        window.location.href = "admin.html";
+    }
+</script>
+
+</header>
+
+
+<main class="container">
+    <h1>Admin Dashboard</h1>
+    <p class="muted">Realistic mock dashboard showing admin controls.</p>
+
+
+<section class="cards">
+    <div class="card">
+        <h3>Manage Students</h3>
+        <ul>
+            <li>Add / remove students</li>
+            <li>Reset passwords</li>
+            <li>Assign labs</li>
+        </ul>
+    </div>
+
+
+<div class="card">
+        <h3>VM Control</h3>
+    <ul>
+        <li>Start / stop student VMs</li>
+        <li>Reset snapshots</li>
+        <li>View connection details</li>
+    </ul>
+</div>
+
+
+<div class="card">
+        <h3>Monitoring</h3>
+        <p>Live usage:</p>
+        <div class="dashboard-sample">
+            <div class="dash-card">CPU: 42%</div>
+            <div class="dash-card">RAM: 58%</div>
+            <div class="dash-card">Storage: 70%</div>
+        </div>
+</div>
+</section>
+</main>
+
+</script>
+<script src="app.js"></script>
+
+</body>
+</html>
