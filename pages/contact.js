@@ -24,7 +24,7 @@ export default function ContactPage() {
             <Link href="/security">Security</Link>
             <Link href="/contact">Contact</Link>
             <Link href="/stud-dash">User Portal</Link>
-            <Link href="/admin-login">Admin Login</Link>
+            <Link href="/admin">Admin Login</Link>
           </nav>
           <button className="nav-toggle" aria-label="Toggle navigation">
             ☰
