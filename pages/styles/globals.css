@@ -254,7 +254,7 @@ button:focus,
 input:focus,
 select:focus,
 textarea:focus {
-  @apply outline outline-3 outline-narrek-accent/20 outline-offset-2;
+  @apply outline outline-2 outline-narrek-accent/20 outline-offset-2;
 }
 
 /* Print */
@@ -270,4 +270,3 @@ textarea:focus {
     @apply shadow-none;
   }
 }
-
