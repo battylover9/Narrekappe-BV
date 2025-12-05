@@ -13,10 +13,8 @@ export default function HomePage() {
             <Link href="/">Home</Link>
             <Link href="/features">Features</Link>
             <Link href="/training">Training</Link>
-            <Link href="/security">Security</Link>
-            <Link href="/contact">Contact</Link>
-            <Link href="/user-portal">User Portal</Link>
-            <Link href="/admin-login">Admin Login</Link>
+            <Link href="/stud-dash">Student Portal</Link>
+            <Link href="/admin-monitoring">Admin Monitor</Link>
           </nav>
           <button className="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
             ☰
@@ -80,13 +78,13 @@ export default function HomePage() {
           <h2>Quick links</h2>
           <ul className="quick-links">
             <li>
-              <Link href="/admin">Admin Dashboard Concept</Link>
+              <Link href="/stud-dash">Student Portal</Link>
+            </li>
+            <li>
+              <Link href="/admin-monitoring">Admin Monitoring Dashboard</Link>
             </li>
             <li>
               <Link href="/training">Student Guide &amp; Labs</Link>
-            </li>
-            <li>
-              <Link href="/contact">Contact / Request Access</Link>
             </li>
           </ul>
         </article>
