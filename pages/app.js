@@ -32,7 +32,7 @@
     // Student login
     if (role === 'student') {
       if (pass.length >= 4) {
-        window.location.href = '/student-dashboard';
+        window.location.href = '/student-dash';
       } else {
         alert('Invalid student credentials');
       }
@@ -50,7 +50,7 @@
 
   // Get list of VMs (from S3/Proxmox helper)
   async function api_getProxmoxVMs() {
-    return fetch('/api/proxmox/vms')
+    return fetch('/api/vms')
       .then((res) => res.json())
       .catch((err) => console.error('Proxmox VM fetch failed:', err));
   }
