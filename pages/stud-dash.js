@@ -131,8 +131,10 @@ export default function StudentDashboardPage() {
     return (
       <>
         <header className="site-header">
-          <div className="container header-inner">
-            <Link className="brand" href="/">Narrekappe<span className="accent">.</span></Link>
+          <div className="header-inner">
+            <Link href="/" className="brand">
+              Narrekappe<span className="accent">.</span>
+            </Link>
             <nav className="main-nav">
               <Link href="/">Home</Link>
               <Link href="/features">Features</Link>
@@ -140,14 +142,26 @@ export default function StudentDashboardPage() {
             </nav>
           </div>
         </header>
-        <main className="container">
-          <div className="card login-card">
-            <h1>Student Login</h1>
-            <p className="muted">Enter your name to access training labs</p>
-            <form onSubmit={handleLogin}>
-              <label>Your Name</label>
-              <input type="text" name="userName" placeholder="Enter your full name" required />
-              <button className="btn" type="submit" style={{ width: '100%', marginTop: '1rem' }}>Access Labs</button>
+
+        <main className="container pt-12">
+          <div className="card max-w-lg mx-auto">
+            <h1 className="text-3xl font-bold mb-2">Student Login</h1>
+            <p className="muted mb-6">Enter your name to access training labs</p>
+            
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block mb-2 font-medium">Your Name</label>
+                <input
+                  type="text"
+                  name="userName"
+                  placeholder="Enter your full name"
+                  required
+                  className="form-input"
+                />
+              </div>
+              <button type="submit" className="btn w-full">
+                Access Labs
+              </button>
             </form>
           </div>
         </main>
@@ -158,42 +172,45 @@ export default function StudentDashboardPage() {
   return (
     <>
       <header className="site-header">
-        <div className="container header-inner">
-          <Link className="brand" href="/">Narrekappe<span className="accent">.</span></Link>
+        <div className="header-inner">
+          <Link href="/" className="brand">
+            Narrekappe<span className="accent">.</span>
+          </Link>
           <nav className="main-nav">
             <Link href="/">Home</Link>
             <span className="muted">Welcome, {userName}</span>
-            <button onClick={handleLogout} className="btn ghost btn-sm">Logout</button>
+            <button onClick={handleLogout} className="btn btn-ghost btn-sm">
+              Logout
+            </button>
           </nav>
         </div>
       </header>
-      
-      <main className="container">
+
+      <main className="container py-8">
         {message && (
-          <div className={`card message-box ${message.includes('✓') ? 'message-success' : 'message-error'}`}>
+          <div className={`message-box ${message.includes('✓') ? 'message-success' : 'message-error'}`}>
             {message}
           </div>
         )}
 
-        <section style={{ marginTop: '2rem' }}>
-          <h1>Available Training Labs</h1>
-          <p className="muted">Select a vulnerable machine to deploy and practice your cybersecurity skills</p>
-          
-          <div className="cards" style={{ marginTop: '1.5rem' }}>
+        <section className="mt-8">
+          <h1 className="text-4xl font-bold mb-2">Available Training Labs</h1>
+          <p className="muted mb-6">Select a vulnerable machine to deploy and practice your cybersecurity skills</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {vms.length === 0 ? (
-              <div className="card empty-state">
-                <p>Loading available VMs...</p>
+              <div className="card col-span-full text-center py-8">
+                <p className="muted">Loading available VMs...</p>
               </div>
             ) : (
               vms.map(vm => (
-                <div key={vm.name} className="card">
-                  <h3>{vm.displayName}</h3>
-                  <p className="muted small">Size: {vm.size}</p>
-                  <button 
-                    onClick={() => deployVM(vm.name)} 
-                    disabled={loading} 
-                    className={`btn ${loading ? 'loading' : ''}`}
-                    style={{ width: '100%', marginTop: '1rem' }}
+                <div key={vm.name} className="card hover:shadow-2xl transition-shadow">
+                  <h3 className="text-xl font-bold mb-2">{vm.displayName}</h3>
+                  <p className="muted small mb-4">Size: {vm.size}</p>
+                  <button
+                    onClick={() => deployVM(vm.name)}
+                    disabled={loading}
+                    className="btn w-full"
                   >
                     {loading ? 'Deploying...' : 'Deploy Lab'}
                   </button>
@@ -203,17 +220,17 @@ export default function StudentDashboardPage() {
           </div>
         </section>
 
-        <section style={{ marginTop: '3rem' }}>
-          <h2>Your Active Labs</h2>
-          <p className="muted">Manage your deployed virtual machines</p>
-          
+        <section className="mt-12">
+          <h2 className="text-3xl font-bold mb-2">Your Active Labs</h2>
+          <p className="muted mb-6">Manage your deployed virtual machines</p>
+
           {deployments.length === 0 ? (
-            <div className="card empty-state">
-              <p>No VMs deployed yet. Deploy a lab above to get started!</p>
+            <div className="card text-center py-8">
+              <p className="muted">No VMs deployed yet. Deploy a lab above to get started!</p>
             </div>
           ) : (
-            <div style={{ marginTop: '1.5rem', overflowX: 'auto' }}>
-              <table>
+            <div className="overflow-x-auto">
+              <table className="data-table">
                 <thead>
                   <tr>
                     <th>VM ID</th>
@@ -225,7 +242,7 @@ export default function StudentDashboardPage() {
                 <tbody>
                   {deployments.map(d => (
                     <tr key={d.vmid}>
-                      <td>{d.vmid}</td>
+                      <td className="font-mono">{d.vmid}</td>
                       <td>{d.name}</td>
                       <td>
                         <span className={`status-badge ${d.status === 'running' ? 'status-running' : 'status-stopped'}`}>
@@ -233,7 +250,7 @@ export default function StudentDashboardPage() {
                         </span>
                       </td>
                       <td>
-                        <div className="action-buttons">
+                        <div className="flex flex-wrap gap-2">
                           {d.status === 'stopped' && (
                             <button onClick={() => startVM(d.vmid)} className="btn btn-sm">
                               Start
@@ -244,10 +261,10 @@ export default function StudentDashboardPage() {
                               Stop
                             </button>
                           )}
-                          <a 
-                            href={`https://192.168.205.30:8006/?console=${d.vmid}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
+                          <a
+                            href={`https://192.168.205.30:8006/?console=${d.vmid}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="btn btn-sm btn-success"
                           >
                             Console
@@ -267,7 +284,7 @@ export default function StudentDashboardPage() {
       </main>
 
       <footer className="site-footer">
-        <div className="container footer-inner">
+        <div className="footer-inner">
           <p>© 2025 Narrekappe B.V. – Cybersecurity Training Platform</p>
         </div>
       </footer>
