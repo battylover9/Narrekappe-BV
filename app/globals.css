@@ -1,0 +1,98 @@
+/* Narrekappe Training Platform — styles.css */
+:root{
+    --bg:#071026;
+    --card:#0f1724;
+    --muted:#9aa6b2;
+    --accent:#3990ff;
+    --accent-2:#6ee7b7;
+    --glass: rgba(255,255,255,0.03);
+    --radius:12px;
+    --maxw:1100px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;}
+body{margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:#e6eef8;background:linear-gradient(180deg,var(--bg),#021023);}
+.container{max-width:var(--maxw);margin:0 auto;padding:1.25rem}
+
+
+/* Header */
+.site-header{background:linear-gradient(90deg,rgba(3,7,18,0.9),rgba(6,10,20,0.95));backdrop-filter:blur(4px);border-bottom:1px solid rgba(255,255,255,0.03)}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.brand{color:white;text-decoration:none;font-weight:700;font-size:1.25rem}
+.brand .accent{color:var(--accent)}
+.main-nav{display:flex;gap:1rem}
+.main-nav a{color:var(--muted);text-decoration:none;padding:0.5rem;border-radius:8px}
+.main-nav a:hover{color:white;background:rgba(255,255,255,0.02)}
+.nav-toggle{display:none;background:transparent;border:0;color:var(--muted);font-size:1.1rem}
+
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1fr 260px;gap:1rem;align-items:start;padding-top:2.25rem}
+.hero-content h1{margin:0 0 0.25rem 0;font-size:2rem}
+.lead{color:var(--muted);margin:0 0 1rem 0}
+.hero-cta .btn{margin-right:0.5rem}
+.stats{display:flex;flex-direction:column;gap:0.75rem}
+.stat{background:var(--card);padding:1rem;border-radius:12px;text-align:center}
+.stat .num{font-size:1.25rem;font-weight:700}
+.stat .label{color:var(--muted);font-size:0.9rem}
+
+
+/* Cards and layout */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.25rem}
+.card{background:var(--card);padding:1rem;border-radius:var(--radius);box-shadow:0 8px 30px rgba(2,6,15,0.6)}
+.muted{color:var(--muted)}
+.small{font-size:0.9rem}
+.quick-links li{margin-bottom:0.5rem}
+
+
+/* Features grid */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.feature ul{margin:0.5rem 0 0 1rem}
+
+
+/* Admin dashboard sample */
+.dashboard-sample{display:flex;gap:0.75rem;margin-top:0.5rem}
+.dash-card{flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:0.75rem;border-radius:10px;text-align:center}
+
+
+/* Contact form */
+.contact-form{display:grid;gap:0.5rem}
+.contact-form input,.contact-form textarea,.contact-form select{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:0.6rem;border-radius:8px;color:#e6eef8}
+.form-actions{display:flex;gap:0.5rem;align-items:center}
+
+
+/* Buttons */
+.btn{display:inline-block;padding:0.6rem 0.9rem;border-radius:10px;background:var(--accent);color:white;text-decoration:none;border:0;font-weight:600}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+
+/* Footer */
+.site-footer{padding:1rem 0;margin-top:1.5rem;color:var(--muted);border-top:1px solid rgba(255,255,255,0.03)}
+.footer-inner{display:flex;justify-content:space-between;align-items:center}
+.footer-nav a{color:var(--muted);text-decoration:none;margin-left:0.75rem}
+
+
+/* Responsive */
+@media (max-width:980px){
+.cards{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr}
+.hero{grid-template-columns:1fr}
+}
+@media (max-width:680px){
+.cards{grid-template-columns:1fr}
+.main-nav{display:none}
+.nav-toggle{display:block}
+.container{padding:0.75rem}
+}
+
+
+/* Accessibility */
+a:focus,button:focus,input:focus,select:focus,textarea:focus{outline:3px solid rgba(57,144,255,0.18);outline-offset:3px}
+
+
+/* Print */
+@media print{body{background:white;color:black} .site-header,.site-footer{display:none} .card{box-shadow:none}}
+
+
+/* End of styles.css */

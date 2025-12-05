@@ -1,5 +1,6 @@
 
 import './globals.css';
+import Script from 'next/script';
 
 export const metadata = {
   title: 'Narrekappe Training Platform',
@@ -9,8 +10,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="theme-dark">
+      <body>
         {children}
+        <Script src="/app.js" strategy="afterInteractive" />
       </body>
     </html>
   );

@@ -1,215 +1,215 @@
+// public/app.js
+// Narrekappe front-end helpers & placeholder APIs
 
-//LOGIN SYSTEM (Front-end mock until backend exists)
+(function () {
+  if (typeof window === 'undefined') return;
 
-function handleLogin(role) {
-    const user = document.querySelector('#username')?.value || document.querySelector('#studentid')?.value;
+  //
+  // LOGIN SYSTEM (front-end mock until real backend exists)
+  //
+
+  function handleLogin(role) {
+    const user =
+      document.querySelector('#username')?.value ||
+      document.querySelector('#studentid')?.value;
     const pass = document.querySelector('#password')?.value;
 
     if (!user || !pass) {
-        alert("Please fill in all fields.");
-        return false;
+      alert('Please fill in all fields.');
+      return false;
     }
+
     // Admin login
-    if (role === "admin") {
-        if (user === "admin" && pass === "admin123") {
-            window.location.href = "admin-dashboard.html";
-        } else {
-            alert("Invalid admin credentials");
-        }
-        return false;
+    if (role === 'admin') {
+      if (user === 'admin' && pass === 'admin123') {
+        window.location.href = '/admin-dashboard';
+      } else {
+        alert('Invalid admin credentials');
+      }
+      return false;
     }
 
     // Student login
-    if (role === "student") {
-        if (pass.length >= 4) {
-            window.location.href = "student-dashboard.html";
-        } else {
-            alert("Invalid student credentials");
-        }
-        return false;
+    if (role === 'student') {
+      if (pass.length >= 4) {
+        window.location.href = '/student-dashboard';
+      } else {
+        alert('Invalid student credentials');
+      }
+      return false;
     }
-}
+  }
 
+  // Expose if you ever use onclick="handleLogin('admin')" in markup
+  window.handleLogin = handleLogin;
 
+  //
+  // PROXMOX API PLACEHOLDERS
+  // (these hit Next.js API routes under /api/proxmox/...)
+  //
 
-//
-// PROXMOX API PLACEHOLDERS
-// 
-// NOTE: These do NOT work yet.
-// When you build a backend, you will replace the fetch()
-// endpoints (`/api/...`) with your server logic.
-
-// Get list of VMs
-async function api_getProxmoxVMs() {
+  // Get list of VMs (from S3/Proxmox helper)
+  async function api_getProxmoxVMs() {
     return fetch('/api/proxmox/vms')
-        .then(res => res.json())
-        .catch(err => console.error('Proxmox VM fetch failed:', err));
-}
+      .then((res) => res.json())
+      .catch((err) => console.error('Proxmox VM fetch failed:', err));
+  }
 
-// Start VM
-async function api_startProxmoxVM(vmid) {
-    return fetch(`/api/proxmox/vm/${vmid}/start`, { method: 'POST' })
-        .then(res => res.json())
-        .catch(err => console.error('Proxmox start failed:', err));
-}
-
-// Stop VM
-async function api_stopProxmoxVM(vmid) {
-    return fetch(`/api/proxmox/vm/${vmid}/stop`, { method: 'POST' })
-        .then(res => res.json())
-        .catch(err => console.error('Proxmox stop failed:', err));
-}
-
-
-
-//
-// 3. VMWARE API PLACEHOLDERS
-
-// Get list of VMware VMs
-async function api_getVMwareVMs() {
-    return fetch('/api/vmware/vms')
-        .then(res => res.json())
-        .catch(err => console.error('VMware VM list failed:', err));
-}
-
-// Power on VMware VM
-async function api_powerOnVMwareVM(vmid) {
-    return fetch(`/api/vmware/vm/${vmid}/poweron`, { method: 'POST' })
-        .then(res => res.json())
-        .catch(err => console.error('VMware power on failed:', err));
-}
-
-// Power off VMware VM
-async function api_powerOffVMwareVM(vmid) {
-    return fetch(`/api/vmware/vm/${vmid}/poweroff`, { method: 'POST' })
-        .then(res => res.json())
-        .catch(err => console.error('VMware power off failed:', err));
-}
-
-
-
-
-async function api_downloadVulnHubMachine(url) {
-    return fetch('/api/vulnhub/import', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ download_url: url })
+  // Start VM
+  async function api_startProxmoxVM(vmid) {
+    return fetch(`/api/proxmox/vm/${vmid}/start`, {
+      method: 'POST',
     })
-    .then(res => res.json())
-    .catch(err => console.error("VulnHub import failed:", err));
-}
+      .then((res) => res.json())
+      .catch((err) => console.error('Proxmox start failed:', err));
+  }
 
-//  OPTIONAL HELPER FUNCTIONS
-// These are ready to connect to UI buttons later.
+  // Stop VM
+  async function api_stopProxmoxVM(vmid) {
+    return fetch(`/api/proxmox/vm/${vmid}/stop`, {
+      method: 'POST',
+    })
+      .then((res) => res.json())
+      .catch((err) => console.error('Proxmox stop failed:', err));
+  }
 
-//  VM card dynamically
-function createVMCard(vm) {
+  //
+  // VMWARE API PLACEHOLDERS
+  //
+
+  async function api_getVMwareVMs() {
+    return fetch('/api/vmware/vms')
+      .then((res) => res.json())
+      .catch((err) => console.error('VMware VM list failed:', err));
+  }
+
+  async function api_powerOnVMwareVM(vmid) {
+    return fetch(`/api/vmware/vm/${vmid}/poweron`, { method: 'POST' })
+      .then((res) => res.json())
+      .catch((err) => console.error('VMware power on failed:', err));
+  }
+
+  async function api_powerOffVMwareVM(vmid) {
+    return fetch(`/api/vmware/vm/${vmid}/poweroff`, { method: 'POST' })
+      .then((res) => res.json())
+      .catch((err) => console.error('VMware power off failed:', err));
+  }
+
+  //
+  // VulnHub import placeholder (kept as-is for when you implement it)
+  //
+
+  async function api_downloadVulnHubMachine(url) {
+    return fetch('/api/vulnhub/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ download_url: url }),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.error('VulnHub import failed:', err));
+  }
+
+  //
+  // Helper: build a VM card block
+  //
+
+  function createVMCard(vm) {
     return `
-        <div class="card">
-            <h3>${vm.name}</h3>
-            <p>Status: ${vm.status}</p>
-            <button onclick="api_startProxmoxVM(${vm.id})" class="btn">Start</button>
-            <button onclick="api_stopProxmoxVM(${vm.id})" class="btn btn-danger">Stop</button>
-        </div>
+      <div class="card">
+        <h3>${vm.name}</h3>
+        <p>Status: ${vm.status || 'unknown'}</p>
+        <button onclick="window.api_startProxmoxVM('${vm.id || vm.vmid}')" class="btn">Start</button>
+        <button onclick="window.api_stopProxmoxVM('${vm.id || vm.vmid}')" class="btn btn-danger">Stop</button>
+      </div>
     `;
-}
+  }
 
-// document.getElementById("loginForm").addEventListener("submit", function (e) {
-//     e.preventDefault(); // stop form from submitting normally
+  //
+  // Admin login form using localStorage "users"
+  //
 
-//     const username = document.getElementById("username").value.trim();
-//     const password = document.getElementById("password").value.trim();
+  function initLoginForm() {
+    const form = document.getElementById('loginForm');
+    if (!form) return;
 
-//     // Prevent empty fields
-//     if (username === "" || password === "") {
-//         alert("Please enter username and password.");
-//         return;
-//     }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
 
-//     // insert names for users here
-//     const allowedUsers = [
-//         { user: "admin", pass: "12345"},
-//         { user: "teacher", pass: "teach2025" }
-//     ];
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-//     // Check if match exists
-//     const valid = allowedUsers.some(u => u.user === username && u.pass === password);
+      const users = JSON.parse(localStorage.getItem('users')) || [];
 
-//     if (valid) {
-//         // Redirect to dashboard
-//         window.location.href = "admin-dashboard.html";
-//     } else {
-//         alert("Incorrect username or password.");
-//     }
-// });
+      const found = users.find(
+        (u) => u.username === username && u.password === password
+      );
 
-
-document.getElementById("loginForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    const found = users.find(u => u.username === username && u.password === password);
-
-    if (!found) {
-        alert("Incorrect username or password.");
+      if (!found) {
+        alert('Incorrect username or password.');
         return;
-    }
+      }
 
-    localStorage.setItem("loggedIn", "yes");
-    localStorage.setItem("currentRole", found.role);
+      localStorage.setItem('loggedIn', 'yes');
+      localStorage.setItem('currentRole', found.role);
 
-    window.location.href = "admin-dashboard.html";
-});
+      window.location.href = '/admin-dashboard';
+    });
+  }
 
+  //
+  // Load Proxmox VMs into admin dashboard container
+  //
 
-if (valid) {
-    // Save login status in local storage of browser
-    localStorage.setItem("loggedIn", "yes");
-
-    // Redirect to dashboard
-    window.location.href = "admin-dashboard.html";
-} else {
-    alert("Incorrect username or password.");
-}
-
-
-// Insert cards into admin dashboard
-async function loadProxmoxVMsIntoDashboard() {
+  async function loadProxmoxVMsIntoDashboard() {
     const container = document.querySelector('#vm-container');
     if (!container) return;
 
-    const vms = await api_getProxmoxVMs();
+    const data = await api_getProxmoxVMs();
+    const vms = data.vms || data.deployments || [];
 
-    container.innerHTML = vms.map(vm => createVMCard(vm)).join('');
-}
+    container.innerHTML = vms.map((vm) => createVMCard(vm)).join('');
+  }
 
-// add users 
+  //
+  // LocalStorage user management
+  //
 
-if (!localStorage.getItem("users")) {
-    const defaultUsers = [
-        { username: "admin", password: "admin123", role: "admin" }
-    ];
-    localStorage.setItem("users", JSON.stringify(defaultUsers));
-}
+  function ensureDefaultUsers() {
+    if (!localStorage.getItem('users')) {
+      const defaultUsers = [
+        { username: 'admin', password: 'admin123', role: 'admin' },
+      ];
+      localStorage.setItem('users', JSON.stringify(defaultUsers));
+    }
+  }
 
-function addUser(username, password, role = "user") {
-    let users = JSON.parse(localStorage.getItem("users")) || [];
+  function addUser(username, password, role = 'user') {
+    let users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Prevent duplicates
-    if (users.some(u => u.username === username)) {
-        alert("User already exists!");
-        return;
+    if (users.some((u) => u.username === username)) {
+      alert('User already exists!');
+      return;
     }
 
     users.push({ username, password, role });
-    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem('users', JSON.stringify(users));
 
-    alert("User created successfully!");
-}
+    alert('User created successfully!');
+  }
 
+  // export some helpers for inline onclick/onload, if you ever need them
+  window.api_getProxmoxVMs = api_getProxmoxVMs;
+  window.api_startProxmoxVM = api_startProxmoxVM;
+  window.api_stopProxmoxVM = api_stopProxmoxVM;
+  window.loadProxmoxVMsIntoDashboard = loadProxmoxVMsIntoDashboard;
+  window.addUser = addUser;
+  window.api_downloadVulnHubMachine = api_downloadVulnHubMachine;
 
-console.log("app.js loaded successfully");
+  // Init once DOM is ready
+  window.addEventListener('DOMContentLoaded', () => {
+    ensureDefaultUsers();
+    initLoginForm();
+    loadProxmoxVMsIntoDashboard();
+    console.log('app.js loaded successfully (Next.js compatible)');
+  });
+})();
