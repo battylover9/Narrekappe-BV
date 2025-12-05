@@ -16,7 +16,7 @@ export default function AdminLoginPage() {
             <Link href="/admin">Admin</Link>
             <Link href="/security">Security</Link>
             <Link href="/contact">Contact</Link>
-            <Link href="/stud-dash">User Portal</Link>
+            <Link href="/user-portal">User Portal</Link>
           </nav>
           <button className="nav-toggle" aria-label="Toggle navigation">
             ☰

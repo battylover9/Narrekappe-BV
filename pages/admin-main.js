@@ -16,9 +16,9 @@ export default function AdminPage() {
             <Link href="/admin">Admin</Link>
             <Link href="/security">Security</Link>
             <Link href="/contact">Contact</Link>
-            <Link href="/stud-dash">User Portal</Link>
+            <Link href="/user-portal">User Portal</Link>
             <Link href="/admin-dashboard">Dashboard</Link>
-            <Link href="/admin">Logout</Link>
+            <Link href="/admin-login">Logout</Link>
           </nav>
           <button className="nav-toggle" aria-label="Toggle navigation">
             ☰

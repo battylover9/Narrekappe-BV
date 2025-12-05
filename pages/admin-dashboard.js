@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
           <nav className="main-nav">
             <Link href="/">Home</Link>
             <Link href="/admin">Admin Info</Link>
-            <Link href="/admin">Logout</Link>
+            <Link href="/admin-login">Logout</Link>
           </nav>
         </div>
       </header>

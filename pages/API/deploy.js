@@ -74,6 +74,14 @@ export default async function handler(req, res) {
     console.log('Cleaning up...');
     await execPromise(`rm -rf ${TEMP_DIR}`);
 
+    // Log deployment
+    try {
+      const logEntry = `${new Date().toISOString()} - ${userName} deployed ${vmName} (VM ${newVmId})\n`;
+      fs.appendFileSync('/var/log/vm-deployments.log', logEntry);
+    } catch (logError) {
+      console.error('Failed to log deployment:', logError);
+    }
+
     console.log(`VM ${newVmId} deployed successfully`);
 
     res.status(200).json({
