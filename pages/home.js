@@ -15,7 +15,7 @@ export default function HomePage() {
             <Link href="/training">Training</Link>
             <Link href="/security">Security</Link>
             <Link href="/contact">Contact</Link>
-            <Link href="/user-portal">User Portal</Link>
+            <Link href="/stud-dash">User Portal</Link>
             <Link href="/admin-login">Admin Login</Link>
           </nav>
           <button className="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
