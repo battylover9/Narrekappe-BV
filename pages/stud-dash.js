@@ -29,7 +29,7 @@ export default function StudentDashboardPage() {
     }
   };
 
-const fetchDeployments = async () => {
+  const fetchDeployments = async () => {
     try {
       const response = await fetch(`/api/vm/deployment?userName=${userName}`);
       const data = await response.json();
@@ -107,15 +107,42 @@ const fetchDeployments = async () => {
     }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const name = e.target.elements.userName.value.trim();
-    if (name) {
-      setUserName(name);
-      setIsLoggedIn(true);
-      if (typeof window !== 'undefined') localStorage.setItem('userName', name);
-      fetchVMs();
-      fetchDeployments();
+    const username = e.target.elements.userName.value.trim();
+    const password = e.target.elements.password.value;
+
+    if (!username || !password) {
+      setMessage('Please enter both username and password');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('Logging in...');
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setUserName(username);
+        setIsLoggedIn(true);
+        if (typeof window !== 'undefined') localStorage.setItem('userName', username);
+        setMessage('');
+        fetchVMs();
+        fetchDeployments();
+      } else {
+        setMessage(`✗ ${data.error || 'Login failed'}`);
+      }
+    } catch (error) {
+      setMessage(`✗ Error: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,21 +173,39 @@ const fetchDeployments = async () => {
         <main className="container pt-12">
           <div className="card max-w-lg mx-auto">
             <h1 className="text-3xl font-bold mb-2">Student Login</h1>
-            <p className="muted mb-6">Enter your name to access training labs</p>
+            <p className="muted mb-6">Login with your Proxmox credentials</p>
             
+            {message && (
+              <div className={`mb-4 p-3 rounded ${message.includes('✗') ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                {message}
+              </div>
+            )}
+
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block mb-2 font-medium">Your Name</label>
+                <label className="block mb-2 font-medium">Username</label>
                 <input
                   type="text"
                   name="userName"
-                  placeholder="Enter your full name"
+                  placeholder="Enter your username"
                   required
                   className="form-input"
+                  disabled={loading}
                 />
               </div>
-              <button type="submit" className="btn w-full">
-                Access Labs
+              <div>
+                <label className="block mb-2 font-medium">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  required
+                  className="form-input"
+                  disabled={loading}
+                />
+              </div>
+              <button type="submit" className="btn w-full" disabled={loading}>
+                {loading ? 'Logging in...' : 'Access Labs'}
               </button>
             </form>
           </div>
@@ -262,7 +307,7 @@ const fetchDeployments = async () => {
                             </button>
                           )}
                           <a
-                            href={`https://192.168.205.30:8006/?console=kvm&novnc=1&vmid=${d.vmid}&vmname=${d.name}&node=pve&resize=off&cmd=`}
+                            href={`https://192.168.205.30:8006/?console=kvm&novnc=1&vmid=${d.vmid}&node=pve&resize=off&cmd=`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-success"
