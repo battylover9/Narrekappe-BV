@@ -21,7 +21,7 @@ export default function StudentDashboardPage() {
 
   const fetchVMs = async () => {
     try {
-      const response = await fetch('/api/vms');
+      const response = await fetch('/api/vm/vms');
       const data = await response.json();
       setVms(data.vms || []);
     } catch (error) {
@@ -31,7 +31,7 @@ export default function StudentDashboardPage() {
 
   const fetchDeployments = async () => {
     try {
-      const response = await fetch('/api/deployment');
+      const response = await fetch('/api/vm/deployment');
       const data = await response.json();
       setDeployments(data.deployments || []);
     } catch (error) {
@@ -44,7 +44,7 @@ export default function StudentDashboardPage() {
     setMessage(`Deploying ${vmName}... This may take a few minutes.`);
 
     try {
-      const response = await fetch('/api/deploy', {
+      const response = await fetch('/api/vm/deploy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmName, userName }),
@@ -66,7 +66,7 @@ export default function StudentDashboardPage() {
 
   const startVM = async (vmId) => {
     try {
-      await fetch('/api/start', {
+      await fetch('/api/vm/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmId }),
@@ -80,7 +80,7 @@ export default function StudentDashboardPage() {
 
   const stopVM = async (vmId) => {
     try {
-      await fetch('/api/stop', {
+      await fetch('/api/vm/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmId }),
@@ -95,7 +95,7 @@ export default function StudentDashboardPage() {
   const deleteVM = async (vmId) => {
     if (!confirm(`Delete VM ${vmId}?`)) return;
     try {
-      await fetch('/api/delete', {
+      await fetch('/api/vm/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmId }),

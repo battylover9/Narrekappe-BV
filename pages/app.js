@@ -50,7 +50,7 @@
 
   // Get list of VMs (from S3/Proxmox helper)
   async function api_getProxmoxVMs() {
-    return fetch('/api/vms')
+    return fetch('/api/vm/vms')
       .then((res) => res.json())
       .catch((err) => console.error('Proxmox VM fetch failed:', err));
   }
