@@ -29,9 +29,9 @@ export default function StudentDashboardPage() {
     }
   };
 
-  const fetchDeployments = async () => {
+const fetchDeployments = async () => {
     try {
-      const response = await fetch('/api/vm/deployment');
+      const response = await fetch(`/api/vm/deployment?userName=${userName}`);
       const data = await response.json();
       setDeployments(data.deployments || []);
     } catch (error) {
