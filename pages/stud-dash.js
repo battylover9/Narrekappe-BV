@@ -262,7 +262,7 @@ export default function StudentDashboardPage() {
                             </button>
                           )}
                           <a
-                            href={`https://192.168.205.30:8006/?console=${d.vmid}`}
+                            href={`https://192.168.205.30:8006/?console=kvm&novnc=1&vmid=${d.vmid}&vmname=${d.name}&node=pve&resize=off&cmd=`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-success"
