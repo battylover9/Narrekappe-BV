@@ -173,8 +173,12 @@ export default function StudentDashboardPage() {
         <main className="container pt-12">
           <div className="card max-w-lg mx-auto">
             <h1 className="text-3xl font-bold mb-2">Student Login</h1>
-            <p className="muted mb-6">Login with your Proxmox credentials</p>
-            
+            <p className="muted mb-6">
+              Login with your Proxmox credentials or{' '}
+              <Link href="/register" className="text-blue-600 hover:underline font-semibold">
+              create an account
+              </Link>
+            </p>
             {message && (
               <div className={`mb-4 p-3 rounded ${message.includes('✗') ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
                 {message}
@@ -207,6 +211,14 @@ export default function StudentDashboardPage() {
               <button type="submit" className="btn w-full" disabled={loading}>
                 {loading ? 'Logging in...' : 'Access Labs'}
               </button>
+              <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600">
+                Don't have an account?{' '}
+                <Link href="/register" className="text-blue-600 hover:underline">
+                Register here
+                </Link>
+              </p>
+              </div>
             </form>
           </div>
         </main>
