@@ -15,7 +15,7 @@ export default function StudentDashboardPage() {
       setUserName(storedUser);
       setIsLoggedIn(true);
       fetchVMs();
-      fetchDeployments();
+      fetchDeployments(storedUser);
     }
   }, []);
 
@@ -53,7 +53,7 @@ export default function StudentDashboardPage() {
       const data = await response.json();
       if (response.ok) {
         setMessage(`✓ ${vmName} deployed successfully! VM ID: ${data.vmId}`);
-        fetchDeployments();
+        fetchDeployments(userName);
       } else {
         setMessage(`✗ Error: ${data.error}`);
       }
@@ -72,7 +72,7 @@ export default function StudentDashboardPage() {
         body: JSON.stringify({ vmId }),
       });
       setMessage(`✓ VM ${vmId} started successfully`);
-      fetchDeployments();
+      fetchDeployments(userName);
     } catch (error) {
       setMessage(`✗ Error: ${error.message}`);
     }
@@ -86,7 +86,7 @@ export default function StudentDashboardPage() {
         body: JSON.stringify({ vmId }),
       });
       setMessage(`✓ VM ${vmId} stopped successfully`);
-      fetchDeployments();
+      fetchDeployments(userName);
     } catch (error) {
       setMessage(`✗ Error: ${error.message}`);
     }
@@ -101,7 +101,7 @@ export default function StudentDashboardPage() {
         body: JSON.stringify({ vmId }),
       });
       setMessage(`✓ VM ${vmId} deleted successfully`);
-      fetchDeployments();
+      fetchDeployments(userName);
     } catch (error) {
       setMessage(`✗ Error: ${error.message}`);
     }
@@ -135,7 +135,7 @@ export default function StudentDashboardPage() {
         if (typeof window !== 'undefined') localStorage.setItem('userName', username);
         setMessage('');
         fetchVMs();
-        fetchDeployments();
+        fetchDeployments(userName);
       } else {
         setMessage(`✗ ${data.error || 'Login failed'}`);
       }
@@ -348,3 +348,4 @@ export default function StudentDashboardPage() {
     </>
   );
 }
+
