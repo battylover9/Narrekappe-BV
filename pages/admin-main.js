@@ -23,6 +23,7 @@ export default function AdminPage() {
             <Link href="/">Home</Link>
             <Link href="/admin-dashboard">Dashboard</Link>
             <Link href="/admin-monitoring">Monitoring</Link>
+            <Link href="/admin-import-users">Import Users</Link>
             <button onClick={logout} className="btn btn-ghost btn-sm">Logout</button>
           </nav>
         </div>
@@ -31,6 +32,24 @@ export default function AdminPage() {
       <main className="container">
         <h1>Admin Dashboard</h1>
         <p className="muted">Welcome, {adminUser}!</p>
+
+        {/* Quick Actions */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
+          <Link href="/admin-import-users" className="card hover:shadow-2xl transition-shadow" style={{textDecoration: 'none', color: 'inherit'}}>
+            <h3 className="text-xl font-bold mb-2">👥 Import Users</h3>
+            <p className="muted">Bulk import students from CSV file</p>
+          </Link>
+
+          <Link href="/admin-monitoring" className="card hover:shadow-2xl transition-shadow" style={{textDecoration: 'none', color: 'inherit'}}>
+            <h3 className="text-xl font-bold mb-2">📊 Monitoring</h3>
+            <p className="muted">View VM status and resource usage</p>
+          </Link>
+
+          <Link href="/admin-dashboard" className="card hover:shadow-2xl transition-shadow" style={{textDecoration: 'none', color: 'inherit'}}>
+            <h3 className="text-xl font-bold mb-2">🎛️ Dashboard</h3>
+            <p className="muted">Manage VMs and student labs</p>
+          </Link>
+        </section>
 
         <section className="card">
           <h2>User &amp; Lab Management</h2>
