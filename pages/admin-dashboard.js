@@ -1,16 +1,19 @@
+// app/admin-dashboard/page.js
 import Link from 'next/link';
-import { useAdminAuth } from '../lib/AdminAuthCheck';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminDashboardPage() {
-  const { isAuthenticated, loading, logout } = useAdminAuth();
+  const router = useRouter();
 
-  if (loading) {
-    return <div className="container pt-12">Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Mimic the old localStorage auth check
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (localStorage.getItem('loggedIn') !== 'yes') {
+        router.push('/admin');
+      }
+    }
+  }, [router]);
 
   return (
     <>
@@ -21,9 +24,8 @@ export default function AdminDashboardPage() {
           </Link>
           <nav className="main-nav">
             <Link href="/">Home</Link>
-            <Link href="/admin-main">Admin</Link>
-            <Link href="/admin-monitoring">Monitoring</Link>
-            <button onClick={logout} className="btn btn-ghost btn-sm">Logout</button>
+            <Link href="/admin">Admin Info</Link>
+            <Link href="/admin-login">Logout</Link>
           </nav>
         </div>
       </header>

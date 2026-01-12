@@ -1,17 +1,7 @@
+
 import Link from 'next/link';
-import { useAdminAuth } from '../lib/AdminAuthCheck';
 
 export default function AdminPage() {
-  const { isAuthenticated, loading, adminUser, logout } = useAdminAuth();
-
-  if (loading) {
-    return <div className="container pt-12">Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
   return (
     <>
       <header className="site-header">
@@ -21,35 +11,26 @@ export default function AdminPage() {
           </Link>
           <nav className="main-nav">
             <Link href="/">Home</Link>
+            <Link href="/features">Features</Link>
+            <Link href="/training">Training</Link>
+            <Link href="/admin">Admin</Link>
+            <Link href="/security">Security</Link>
+            <Link href="/contact">Contact</Link>
+            <Link href="/user-portal">User Portal</Link>
             <Link href="/admin-dashboard">Dashboard</Link>
-            <Link href="/admin-monitoring">Monitoring</Link>
-            <Link href="/admin-import-users">Import Users</Link>
-            <button onClick={logout} className="btn btn-ghost btn-sm">Logout</button>
+            <Link href="/admin-login">Logout</Link>
           </nav>
+          <button className="nav-toggle" aria-label="Toggle navigation">
+            ☰
+          </button>
         </div>
       </header>
 
       <main className="container">
-        <h1>Admin Dashboard</h1>
-        <p className="muted">Welcome, {adminUser}!</p>
-
-        {/* Quick Actions */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8">
-          <Link href="/admin-import-users" className="card hover:shadow-2xl transition-shadow" style={{textDecoration: 'none', color: 'inherit'}}>
-            <h3 className="text-xl font-bold mb-2">👥 Import Users</h3>
-            <p className="muted">Bulk import students from CSV file</p>
-          </Link>
-
-          <Link href="/admin-monitoring" className="card hover:shadow-2xl transition-shadow" style={{textDecoration: 'none', color: 'inherit'}}>
-            <h3 className="text-xl font-bold mb-2">📊 Monitoring</h3>
-            <p className="muted">View VM status and resource usage</p>
-          </Link>
-
-          <Link href="/admin-dashboard" className="card hover:shadow-2xl transition-shadow" style={{textDecoration: 'none', color: 'inherit'}}>
-            <h3 className="text-xl font-bold mb-2">🎛️ Dashboard</h3>
-            <p className="muted">Manage VMs and student labs</p>
-          </Link>
-        </section>
+        <h1>Admin Dashboard Concept</h1>
+        <p className="muted">
+          This page outlines the capabilities of the admin console — it is a conceptual mockup for the platform.
+        </p>
 
         <section className="card">
           <h2>User &amp; Lab Management</h2>
@@ -71,7 +52,11 @@ export default function AdminPage() {
         <section className="card">
           <h2>Monitoring &amp; Logs</h2>
           <p>Overview of resource usage, alerts for failures, and logs for audit and grading.</p>
-          <Link href="/admin-monitoring" className="btn">View Monitoring →</Link>
+          <div className="dashboard-sample">
+            <div className="dash-card">CPU: 45%</div>
+            <div className="dash-card">RAM: 63%</div>
+            <div className="dash-card">Storage: 72%</div>
+          </div>
         </section>
 
         <section className="card">
@@ -81,6 +66,15 @@ export default function AdminPage() {
             reproducibility.
           </p>
         </section>
+
+        <h3>Create New User</h3>
+        <input type="text" id="newUser" placeholder="Username" />
+        <input type="password" id="newPass" placeholder="Password" />
+        <select id="newRole">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="button">Add User</button>
       </main>
 
       <footer className="site-footer">

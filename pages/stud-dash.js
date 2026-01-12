@@ -15,13 +15,13 @@ export default function StudentDashboardPage() {
       setUserName(storedUser);
       setIsLoggedIn(true);
       fetchVMs();
-      fetchDeployments(storedUser);
+      fetchDeployments();
     }
   }, []);
 
   const fetchVMs = async () => {
     try {
-      const response = await fetch('/api/vm/vms');
+      const response = await fetch('/api/vms');
       const data = await response.json();
       setVms(data.vms || []);
     } catch (error) {
@@ -31,7 +31,7 @@ export default function StudentDashboardPage() {
 
   const fetchDeployments = async () => {
     try {
-      const response = await fetch(`/api/vm/deployment?userName=${userName}`);
+      const response = await fetch('/api/deployment');
       const data = await response.json();
       setDeployments(data.deployments || []);
     } catch (error) {
@@ -44,7 +44,7 @@ export default function StudentDashboardPage() {
     setMessage(`Deploying ${vmName}... This may take a few minutes.`);
 
     try {
-      const response = await fetch('/api/vm/deploy', {
+      const response = await fetch('/api/deploy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmName, userName }),
@@ -53,7 +53,7 @@ export default function StudentDashboardPage() {
       const data = await response.json();
       if (response.ok) {
         setMessage(`✓ ${vmName} deployed successfully! VM ID: ${data.vmId}`);
-        fetchDeployments(userName);
+        fetchDeployments();
       } else {
         setMessage(`✗ Error: ${data.error}`);
       }
@@ -66,13 +66,13 @@ export default function StudentDashboardPage() {
 
   const startVM = async (vmId) => {
     try {
-      await fetch('/api/vm/start', {
+      await fetch('/api/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmId }),
       });
       setMessage(`✓ VM ${vmId} started successfully`);
-      fetchDeployments(userName);
+      fetchDeployments();
     } catch (error) {
       setMessage(`✗ Error: ${error.message}`);
     }
@@ -80,13 +80,13 @@ export default function StudentDashboardPage() {
 
   const stopVM = async (vmId) => {
     try {
-      await fetch('/api/vm/stop', {
+      await fetch('/api/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmId }),
       });
       setMessage(`✓ VM ${vmId} stopped successfully`);
-      fetchDeployments(userName);
+      fetchDeployments();
     } catch (error) {
       setMessage(`✗ Error: ${error.message}`);
     }
@@ -95,54 +95,27 @@ export default function StudentDashboardPage() {
   const deleteVM = async (vmId) => {
     if (!confirm(`Delete VM ${vmId}?`)) return;
     try {
-      await fetch('/api/vm/delete', {
+      await fetch('/api/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vmId }),
       });
       setMessage(`✓ VM ${vmId} deleted successfully`);
-      fetchDeployments(userName);
+      fetchDeployments();
     } catch (error) {
       setMessage(`✗ Error: ${error.message}`);
     }
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    const username = e.target.elements.userName.value.trim();
-    const password = e.target.elements.password.value;
-
-    if (!username || !password) {
-      setMessage('Please enter both username and password');
-      return;
-    }
-
-    setLoading(true);
-    setMessage('Logging in...');
-
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setUserName(username);
-        setIsLoggedIn(true);
-        if (typeof window !== 'undefined') localStorage.setItem('userName', username);
-        setMessage('');
-        fetchVMs();
-        fetchDeployments(userName);
-      } else {
-        setMessage(`✗ ${data.error || 'Login failed'}`);
-      }
-    } catch (error) {
-      setMessage(`✗ Error: ${error.message}`);
-    } finally {
-      setLoading(false);
+    const name = e.target.elements.userName.value.trim();
+    if (name) {
+      setUserName(name);
+      setIsLoggedIn(true);
+      if (typeof window !== 'undefined') localStorage.setItem('userName', name);
+      fetchVMs();
+      fetchDeployments();
     }
   };
 
@@ -173,52 +146,22 @@ export default function StudentDashboardPage() {
         <main className="container pt-12">
           <div className="card max-w-lg mx-auto">
             <h1 className="text-3xl font-bold mb-2">Student Login</h1>
-            <p className="muted mb-6">
-              Login with your Proxmox credentials or{' '}
-              <Link href="/register" className="text-blue-600 hover:underline font-semibold">
-              create an account
-              </Link>
-            </p>
-            {message && (
-              <div className={`mb-4 p-3 rounded ${message.includes('✗') ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                {message}
-              </div>
-            )}
-
+            <p className="muted mb-6">Enter your name to access training labs</p>
+            
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block mb-2 font-medium">Username</label>
+                <label className="block mb-2 font-medium">Your Name</label>
                 <input
                   type="text"
                   name="userName"
-                  placeholder="Enter your username"
+                  placeholder="Enter your full name"
                   required
                   className="form-input"
-                  disabled={loading}
                 />
               </div>
-              <div>
-                <label className="block mb-2 font-medium">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  required
-                  className="form-input"
-                  disabled={loading}
-                />
-              </div>
-              <button type="submit" className="btn w-full" disabled={loading}>
-                {loading ? 'Logging in...' : 'Access Labs'}
+              <button type="submit" className="btn w-full">
+                Access Labs
               </button>
-              <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
-                <Link href="/register" className="text-blue-600 hover:underline">
-                Register here
-                </Link>
-              </p>
-              </div>
             </form>
           </div>
         </main>
@@ -319,7 +262,7 @@ export default function StudentDashboardPage() {
                             </button>
                           )}
                           <a
-                            href={`https://192.168.205.30:8006/?console=kvm&novnc=1&vmid=${d.vmid}&node=pve&resize=off&cmd=`}
+                            href={`https://192.168.205.30:8006/?console=${d.vmid}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-success"
@@ -348,4 +291,3 @@ export default function StudentDashboardPage() {
     </>
   );
 }
-

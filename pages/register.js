@@ -1,58 +1,70 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 export default function RegisterPage() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const router = useRouter();
+  const [generatedUsername, setGeneratedUsername] = useState('');
+
+  const generateUsername = (first, last) => {
+    if (!first || !last) return '';
+    return (first[0] + last).toLowerCase();
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
-    const username = e.target.elements.username.value.trim();
-    const password = e.target.elements.password.value;
-    const confirmPassword = e.target.elements.confirmPassword.value;
-    const fullName = e.target.elements.fullName.value.trim();
-    const email = e.target.elements.email.value.trim();
+    setError('');
+    setSuccess('');
 
-    // Client-side validation
     if (password !== confirmPassword) {
-      setMessage('✗ Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
     if (password.length < 8) {
-      setMessage('✗ Password must be at least 8 characters');
+      setError('Password must be at least 8 characters');
       return;
     }
 
     setLoading(true);
-    setMessage('Creating account...');
 
     try {
+      const username = generateUsername(firstName, lastName);
+      
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, fullName, email }),
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          password,
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setMessage('✓ ' + data.message);
+        setSuccess(`Account created! Your username is: ${username}`);
+        setGeneratedUsername(username);
         setTimeout(() => {
-          router.push('/stud-dash');
-        }, 2000);
+          window.location.href = '/stud-dash';
+        }, 3000);
       } else {
-        setMessage('✗ ' + (data.error || 'Registration failed'));
+        setError(data.error || 'Registration failed');
       }
-    } catch (error) {
-      setMessage('✗ Error: ' + error.message);
+    } catch (err) {
+      setError('Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  const previewUsername = generateUsername(firstName, lastName);
 
   return (
     <>
@@ -63,109 +75,107 @@ export default function RegisterPage() {
           </Link>
           <nav className="main-nav">
             <Link href="/">Home</Link>
-            <Link href="/features">Features</Link>
-            <Link href="/training">Training</Link>
+            <Link href="/stud-dash">Login</Link>
           </nav>
         </div>
       </header>
 
-      <main className="container pt-12">
-        <div className="card max-w-lg mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Student Registration</h1>
-          <p className="muted mb-6">Create your account to access training labs</p>
+      <main className="container py-8">
+        <div className="max-w-md mx-auto">
+          <div className="card">
+            <h1 className="text-3xl font-bold mb-2">Register</h1>
+            <p className="muted mb-6">Create your student account</p>
 
-          {message && (
-            <div className={`mb-4 p-3 rounded ${message.includes('✗') ? 'bg-red-100 text-red-700' : message.includes('✓') ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-              {message}
-            </div>
-          )}
+            {error && (
+              <div className="p-4 bg-red-100 text-red-700 rounded mb-4">
+                {error}
+              </div>
+            )}
 
-          <form onSubmit={handleRegister} className="space-y-4">
-            <div>
-              <label className="block mb-2 font-medium">Full Name *</label>
-              <input
-                type="text"
-                name="fullName"
-                placeholder="John Doe"
-                required
-                className="form-input"
+            {success && (
+              <div className="p-4 bg-green-100 text-green-700 rounded mb-4">
+                {success}
+              </div>
+            )}
+
+            <form onSubmit={handleRegister}>
+              <div className="mb-4">
+                <label className="block mb-2 font-medium">First Name</label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="form-input"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-2 font-medium">Last Name</label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="form-input"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              {previewUsername && (
+                <div className="mb-4 p-3 bg-blue-100 text-blue-700 rounded">
+                  <p className="text-sm">
+                    <strong>Your username will be:</strong> {previewUsername}
+                  </p>
+                </div>
+              )}
+
+              <div className="mb-4">
+                <label className="block mb-2 font-medium">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="form-input"
+                  placeholder="At least 8 characters"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="mb-6">
+                <label className="block mb-2 font-medium">Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="form-input"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              <button
+                type="submit"
                 disabled={loading}
-              />
+                className="btn w-full"
+              >
+                {loading ? 'Creating account...' : 'Register'}
+              </button>
+            </form>
+
+            <div className="mt-4 text-center">
+              <p className="text-sm muted">
+                Already have an account?{' '}
+                <Link href="/stud-dash" className="text-blue-500">
+                  Login here
+                </Link>
+              </p>
             </div>
-
-            <div>
-              <label className="block mb-2 font-medium">Username *</label>
-              <input
-                type="text"
-                name="username"
-                placeholder="johndoe"
-                required
-                className="form-input"
-                disabled={loading}
-                pattern="[a-zA-Z0-9]+"
-                title="Only letters and numbers allowed"
-              />
-              <p className="text-sm text-gray-600 mt-1">Only letters and numbers, minimum 3 characters</p>
-            </div>
-
-            <div>
-              <label className="block mb-2 font-medium">Email (Optional)</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="john@example.com"
-                className="form-input"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 font-medium">Password *</label>
-              <input
-                type="password"
-                name="password"
-                placeholder="Minimum 8 characters"
-                required
-                minLength="8"
-                className="form-input"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 font-medium">Confirm Password *</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Re-enter password"
-                required
-                minLength="8"
-                className="form-input"
-                disabled={loading}
-              />
-            </div>
-
-            <button type="submit" className="btn w-full" disabled={loading}>
-              {loading ? 'Creating Account...' : 'Register'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link href="/stud-dash" className="text-blue-600 hover:underline">
-                Login here
-              </Link>
-            </p>
           </div>
         </div>
       </main>
-
-      <footer className="site-footer" style={{ marginTop: '4rem' }}>
-        <div className="footer-inner">
-          <p>© 2025 Narrekappe B.V. – Cybersecurity Training Platform</p>
-        </div>
-      </footer>
     </>
   );
 }

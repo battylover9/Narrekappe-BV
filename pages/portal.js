@@ -16,7 +16,7 @@ export default function UserPortalPage() {
             <Link href="/admin">Admin</Link>
             <Link href="/security">Security</Link>
             <Link href="/contact">Contact</Link>
-            <Link href="/admin">Admin Login</Link>
+            <Link href="/admin-login">Admin Login</Link>
           </nav>
           <button className="nav-toggle" aria-label="Toggle navigation">
             ☰

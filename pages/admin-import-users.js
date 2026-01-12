@@ -87,6 +87,7 @@ export default function AdminImportUsersPage() {
             <Link href="/">Home</Link>
             <Link href="/admin-main">Admin</Link>
             <Link href="/admin-monitoring">Monitoring</Link>
+            <Link href="/admin-import-users">Import Users</Link>
             <button onClick={logout} className="btn btn-ghost btn-sm">Logout</button>
           </nav>
         </div>
@@ -96,7 +97,7 @@ export default function AdminImportUsersPage() {
         <h1 className="text-4xl font-bold mb-2">Import Users</h1>
         <p className="muted mb-6">Bulk import students from CSV file</p>
 
-        {/* Instructions */}
+        {/* Instructions Card */}
         <div className="card mb-6">
           <h2 className="text-2xl font-bold mb-4">Instructions</h2>
           
@@ -113,10 +114,10 @@ export default function AdminImportUsersPage() {
             <div>
               <h3 className="font-bold mb-2">Requirements:</h3>
               <ul className="list-disc list-inside space-y-1">
-                <li>First row must be header: <code>first_name,last_name,password</code></li>
+                <li>First row must be header: first_name,last_name,password</li>
                 <li>Passwords must be at least 8 characters</li>
                 <li>Usernames will be auto-generated: first letter + last name</li>
-                <li>Example: John Doe → username: <code>jdoe</code></li>
+                <li>Example: John Doe → username: jdoe</li>
               </ul>
             </div>
 
@@ -128,12 +129,11 @@ export default function AdminImportUsersPage() {
           </div>
         </div>
 
-        {/* Upload Section */}
+        {/* Upload Card */}
         <div className="card mb-6">
           <h2 className="text-2xl font-bold mb-4">Upload CSV</h2>
 
           <div className="space-y-4">
-            {/* File Upload */}
             <div>
               <label className="block mb-2 font-medium">Upload CSV File</label>
               <input
@@ -150,27 +150,24 @@ export default function AdminImportUsersPage() {
               )}
             </div>
 
-            {/* Or Paste CSV */}
             <div>
               <label className="block mb-2 font-medium">Or Paste CSV Data</label>
               <textarea
                 value={csvText}
                 onChange={(e) => setCsvText(e.target.value)}
-                placeholder="first_name,last_name,password&#10;John,Doe,password123&#10;Jane,Smith,securepass456"
+                placeholder="first_name,last_name,password&#10;John,Doe,password123"
                 rows="10"
                 className="form-input font-mono text-sm"
                 disabled={importing}
               />
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="p-4 bg-red-100 text-red-700 rounded">
                 {error}
               </div>
             )}
 
-            {/* Import Button */}
             <button
               onClick={handleImport}
               disabled={importing || !csvText.trim()}
@@ -181,29 +178,26 @@ export default function AdminImportUsersPage() {
           </div>
         </div>
 
-        {/* Results */}
+        {/* Results Card */}
         {results && (
           <div className="card">
             <h2 className="text-2xl font-bold mb-4">Import Results</h2>
 
-            <div className="mb-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-blue-100 p-4 rounded text-center">
-                  <div className="text-3xl font-bold text-blue-700">{results.total}</div>
-                  <div className="text-sm text-blue-600">Total</div>
-                </div>
-                <div className="bg-green-100 p-4 rounded text-center">
-                  <div className="text-3xl font-bold text-green-700">{results.success}</div>
-                  <div className="text-sm text-green-600">Success</div>
-                </div>
-                <div className="bg-red-100 p-4 rounded text-center">
-                  <div className="text-3xl font-bold text-red-700">{results.failed}</div>
-                  <div className="text-sm text-red-600">Failed</div>
-                </div>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="bg-blue-100 p-4 rounded text-center">
+                <div className="text-3xl font-bold text-blue-700">{results.total}</div>
+                <div className="text-sm text-blue-600">Total</div>
+              </div>
+              <div className="bg-green-100 p-4 rounded text-center">
+                <div className="text-3xl font-bold text-green-700">{results.success}</div>
+                <div className="text-sm text-green-600">Success</div>
+              </div>
+              <div className="bg-red-100 p-4 rounded text-center">
+                <div className="text-3xl font-bold text-red-700">{results.failed}</div>
+                <div className="text-sm text-red-600">Failed</div>
               </div>
             </div>
 
-            {/* Detailed Results */}
             {results.results && results.results.length > 0 && (
               <div className="overflow-x-auto">
                 <table className="data-table">
@@ -225,13 +219,9 @@ export default function AdminImportUsersPage() {
                             <span className="status-badge status-stopped">✗ Failed</span>
                           )}
                         </td>
-                        <td className="font-mono">
-                          {result.userid || '-'}
-                        </td>
+                        <td className="font-mono">{result.userid || '-'}</td>
                         <td>{result.fullName || '-'}</td>
-                        <td className="text-sm">
-                          {result.error || 'User created successfully'}
-                        </td>
+                        <td className="text-sm">{result.error || 'User created successfully'}</td>
                       </tr>
                     ))}
                   </tbody>

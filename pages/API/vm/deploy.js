@@ -1,3 +1,6 @@
+// pages/api/vm/deploy.js
+// UPDATED: Uses qcow2 templates from local Proxmox storage
+
 import { execSSH } from '../../../lib/proxmoxApi';
 
 export default async function handler(req, res) {
@@ -7,50 +10,111 @@ export default async function handler(req, res) {
 
   const { vmName, userName } = req.body;
 
-  console.log('[DEPLOY] Request:', { vmName, userName });
+  if (!vmName || !userName) {
+    return res.status(400).json({ error: 'vmName and userName are required' });
+  }
 
   try {
-    // Simple sanitization
-    const cleanVmName = vmName.replace(/[^a-zA-Z0-9_-]/g, '');
-    const cleanUserName = userName.replace(/[^a-zA-Z0-9_-]/g, '');
+    const TEMPLATE_DIR = '/var/lib/vz/template/qemu';
+    const STORAGE = 'local-lvm';
+    const MEMORY = '2048';
+    const CORES = '2';
+    const NETWORK = 'virtio,bridge=vmbr1'; // Isolated network for vulnerable VMs
 
-    const diskPath = `/var/lib/vz/template/qemu/${cleanVmName}-disk0.qcow2`;
+    console.log(`[DEPLOY] User ${userName} requesting ${vmName}`);
 
-    console.log('[DEPLOY] Checking template:', diskPath);
-    await execSSH(`test -f "${diskPath}"`);
+    // Check if template exists
+    const diskPath = `${TEMPLATE_DIR}/${vmName}-disk0.qcow2`;
+    try {
+      await execSSH(`test -f "${diskPath}"`);
+    } catch {
+      return res.status(404).json({ 
+        error: `VM template '${vmName}' not found. Has it been converted from OVA?` 
+      });
+    }
 
-    console.log('[DEPLOY] Getting VM ID...');
-    const vmList = await execSSH('qm list | tail -n +2 | awk \'{print $1}\' | sort -n | tail -1');
-    const nextId = (parseInt(vmList.trim()) || 100) + 1;
+    // Check if user already has an active VM
+    try {
+      const activeVMs = await execSSH(`qm list | grep "${userName}" || true`);
+      if (activeVMs.trim()) {
+        const vmid = activeVMs.trim().split(/\s+/)[0];
+        return res.status(400).json({
+          error: 'You already have an active VM. Please stop it before starting a new one.',
+          activeVMID: parseInt(vmid)
+        });
+      }
+    } catch {}
 
-    console.log('[DEPLOY] Creating VM', nextId);
-    const vmName2 = `${cleanVmName}-${cleanUserName}`;
-    
-    await execSSH(`qm create ${nextId} --name "${vmName2}" --memory 2048 --cores 2 --net0 virtio,bridge=vmbr1`);
-    
-    console.log('[DEPLOY] Importing disk...');
-    await execSSH(`qm importdisk ${nextId} "${diskPath}" local-lvm`, { timeout: 120000 });
-    
-    console.log('[DEPLOY] Configuring...');
-    await execSSH(`qm set ${nextId} --scsi0 local-lvm:vm-${nextId}-disk-0`);
-    await execSSH(`qm set ${nextId} --boot order=scsi0`);
-    
-    console.log('[DEPLOY] Starting...');
-    await execSSH(`qm start ${nextId}`);
-    
-    console.log('[DEPLOY] Complete!');
+    // Find next available VM ID
+    const vmListOutput = await execSSH('qm list | awk \'NR>1 {print $1}\' | sort -n | tail -1 || echo 100');
+    const lastVmId = parseInt(vmListOutput.trim()) || 100;
+    const newVmId = lastVmId + 1;
 
-    return res.status(200).json({
+    const vmDisplayName = `${vmName}-${userName}`;
+
+    console.log(`[DEPLOY] Creating VM ${newVmId}...`);
+
+    // Create VM
+    await execSSH(`qm create ${newVmId} \
+      --name "${vmDisplayName}" \
+      --memory ${MEMORY} \
+      --cores ${CORES} \
+      --net0 ${NETWORK} \
+      --scsihw virtio-scsi-pci \
+      --description "Deployed for: ${userName} on $(date +%Y-%m-%d_%H:%M:%S)"`);
+
+    // Import disk from template
+    console.log(`[DEPLOY] Importing disk...`);
+    await execSSH(`qm importdisk ${newVmId} "${diskPath}" ${STORAGE}`);
+
+    // Attach disk and configure boot
+    console.log(`[DEPLOY] Configuring boot...`);
+    await execSSH(`qm set ${newVmId} --scsi0 ${STORAGE}:vm-${newVmId}-disk-0`);
+    await execSSH(`qm set ${newVmId} --boot order=scsi0`);
+    await execSSH(`qm set ${newVmId} --vga std`);
+
+    // Start VM
+    console.log(`[DEPLOY] Starting VM ${newVmId}...`);
+    await execSSH(`qm start ${newVmId}`);
+
+    // Wait for IP address (try for 60 seconds)
+    let ipAddress = null;
+    for (let i = 0; i < 12; i++) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      try {
+        const configOutput = await execSSH(`qm config ${newVmId}`);
+        const macMatch = configOutput.match(/virtio=([0-9A-Fa-f:]+)/);
+        
+        if (macMatch) {
+          const mac = macMatch[1];
+          const arpOutput = await execSSH(`arp -n | grep -i "${mac}" || true`);
+          const ipMatch = arpOutput.match(/(\d+\.\d+\.\d+\.\d+)/);
+          
+          if (ipMatch) {
+            ipAddress = ipMatch[1];
+            break;
+          }
+        }
+      } catch {}
+    }
+
+    console.log(`[DEPLOY] VM ${newVmId} deployed successfully`);
+
+    res.status(200).json({
       success: true,
-      vmId: nextId,
-      vmName: vmName2,
-      message: 'VM deployed!'
+      vmId: newVmId,
+      vmName: vmDisplayName,
+      ipAddress: ipAddress || 'Waiting for network... Check Proxmox console',
+      message: 'VM deployed successfully! Wait 1-2 minutes for full boot.',
+      expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
     });
 
   } catch (error) {
-    console.error('[DEPLOY ERROR]', error.message);
-    return res.status(500).json({
-      error: error.message
+    console.error('[DEPLOY ERROR]', error);
+    res.status(500).json({
+      error: 'Failed to deploy VM',
+      details: error.message
     });
   }
 }

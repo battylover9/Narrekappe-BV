@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useAdminAuth } from '../lib/AdminAuthCheck';
 
 export default function AdminMonitoringPage() {
-  const { isAuthenticated, loading: authLoading, logout } = useAdminAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -22,15 +20,13 @@ export default function AdminMonitoringPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchStats();
-      
-      if (autoRefresh) {
-        const interval = setInterval(fetchStats, refreshInterval * 1000);
-        return () => clearInterval(interval);
-      }
+    fetchStats();
+    
+    if (autoRefresh) {
+      const interval = setInterval(fetchStats, refreshInterval * 1000);
+      return () => clearInterval(interval);
     }
-  }, [isAuthenticated, autoRefresh, refreshInterval]);
+  }, [autoRefresh, refreshInterval]);
 
   const getStatusColor = (status) => {
     return status === 'running' ? 'status-running' : 'status-stopped';
@@ -42,14 +38,6 @@ export default function AdminMonitoringPage() {
     return 'text-green-500';
   };
 
-  if (authLoading) {
-    return <div className="container pt-12">Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
   if (loading) {
     return (
       <>
@@ -60,8 +48,7 @@ export default function AdminMonitoringPage() {
             </Link>
             <nav className="main-nav">
               <Link href="/">Home</Link>
-              <Link href="/admin-main">Admin</Link>
-              <button onClick={logout} className="btn btn-ghost btn-sm">Logout</button>
+              <Link href="/admin">Admin</Link>
             </nav>
           </div>
         </header>
@@ -83,9 +70,8 @@ export default function AdminMonitoringPage() {
           </Link>
           <nav className="main-nav">
             <Link href="/">Home</Link>
-            <Link href="/admin-main">Admin</Link>
+            <Link href="/admin">Admin</Link>
             <Link href="/stud-dash">Student Portal</Link>
-            <button onClick={logout} className="btn btn-ghost btn-sm">Logout</button>
           </nav>
         </div>
       </header>
@@ -167,6 +153,37 @@ export default function AdminMonitoringPage() {
           </div>
         </div>
 
+        {/* Recent Deployments */}
+        {stats?.recentDeployments && stats.recentDeployments.length > 0 && (
+          <div className="card mb-8">
+            <h2 className="text-2xl font-bold mb-4">Recent Deployments</h2>
+            <div className="overflow-x-auto">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>VM Name</th>
+                    <th>VM ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.recentDeployments.map((deployment, index) => (
+                    <tr key={index}>
+                      <td className="font-mono text-sm">
+                        {new Date(deployment.timestamp).toLocaleString()}
+                      </td>
+                      <td>{deployment.userName}</td>
+                      <td>{deployment.vmName}</td>
+                      <td className="font-mono">{deployment.vmId}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* VM Details Table */}
         <div className="card">
           <h2 className="text-2xl font-bold mb-4">All Virtual Machines</h2>
@@ -183,13 +200,15 @@ export default function AdminMonitoringPage() {
                     <th>VM ID</th>
                     <th>Name</th>
                     <th>Status</th>
+                    <th>CPU</th>
                     <th>Memory</th>
                     <th>Disk</th>
                     <th>Uptime</th>
+                    <th>Node</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {stats?.vms?.map(vm => (
+                  {stats?.vms.map(vm => (
                     <tr key={vm.vmid}>
                       <td className="font-mono">{vm.vmid}</td>
                       <td className="font-medium">{vm.name}</td>
@@ -198,15 +217,66 @@ export default function AdminMonitoringPage() {
                           {vm.status}
                         </span>
                       </td>
-                      <td>{vm.memory || 'N/A'}</td>
-                      <td>{vm.bootdisk || 'N/A'}</td>
-                      <td className="font-mono text-sm">{vm.uptime || '-'}</td>
+                      <td className={getResourceColor(parseFloat(vm.cpuUsage))}>
+                        {vm.cpuUsage}%
+                      </td>
+                      <td>
+                        <div className={getResourceColor(parseFloat(vm.memPercent))}>
+                          {vm.memUsage} MB
+                        </div>
+                        <div className="text-xs muted">
+                          {vm.memPercent}% of {vm.memMax} MB
+                        </div>
+                      </td>
+                      <td>
+                        <div>{vm.diskUsage} GB</div>
+                        <div className="text-xs muted">of {vm.diskMax} GB</div>
+                      </td>
+                      <td className="font-mono text-sm">{vm.uptime}</td>
+                      <td className="text-sm muted">{vm.node}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+        </div>
+
+        {/* Resource Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          <div className="card">
+            <h3 className="text-xl font-bold mb-4">Memory Overview</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="muted">Total Allocated:</span>
+                <span className="font-bold">{stats?.summary.memMax || '0'} GB</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="muted">Currently Used:</span>
+                <span className="font-bold">{stats?.summary.memUsed || '0'} GB</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="muted">Usage:</span>
+                <span className={`font-bold ${getResourceColor(parseFloat(stats?.summary.memPercent || 0))}`}>
+                  {stats?.summary.memPercent || '0'}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="text-xl font-bold mb-4">Disk Overview</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="muted">Total Allocated:</span>
+                <span className="font-bold">{stats?.summary.diskMax || '0'} GB</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="muted">Currently Used:</span>
+                <span className="font-bold">{stats?.summary.diskUsed || '0'} GB</span>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
