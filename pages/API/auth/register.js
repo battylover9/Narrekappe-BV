@@ -1,72 +1,68 @@
-import { proxmoxCreateUser, proxmoxListUsers, getRealm } from '../../../lib/proxmoxApi';
+import { execSSH } from '../../../lib/proxmoxApi';
+
+function sanitizeInput(input, type = 'alphanumeric') {
+  const patterns = {
+    alphanumeric: /^[a-zA-Z0-9_-]+$/,
+    name: /^[a-zA-Z]{2,50}$/,
+    username: /^[a-z][a-z0-9_-]{2,31}$/,
+  };
+
+  if (!patterns[type].test(input)) {
+    return false;
+  }
+  return true;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { username, password, fullName, email } = req.body;
-
-  // Validation
-  if (!username || !password || !fullName) {
-    return res.status(400).json({ 
-      error: 'Username, password, and full name are required' 
-    });
-  }
-
-  if (password.length < 8) {
-    return res.status(400).json({ 
-      error: 'Password must be at least 8 characters' 
-    });
-  }
-
-  // Sanitize username (only letters and numbers)
-  const cleanUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
-  
-  if (cleanUsername.length < 3) {
-    return res.status(400).json({ 
-      error: 'Username must be at least 3 characters (letters/numbers only)' 
-    });
-  }
-
   try {
-    console.log('[REGISTER] Registration attempt for:', cleanUsername);
+    const { firstName, lastName, password } = req.body;
 
-    const realm = getRealm();
-    const userid = `${cleanUsername}@${realm}`;
-
-    // Check if user already exists
-    const users = await proxmoxListUsers();
-    const userExists = users.some(u => u.userid === userid);
-
-    if (userExists) {
-      console.log('[REGISTER] User already exists:', cleanUsername);
-      return res.status(409).json({ 
-        error: 'Username already taken. Please choose another.' 
-      });
+    // Validate inputs
+    if (!firstName || !lastName || !password) {
+      return res.status(400).json({ error: 'All fields required' });
     }
 
-    // Create the user
-    await proxmoxCreateUser({
-      userid,
-      fullName,
-      password,
-      email: email || undefined
-    });
+    if (!sanitizeInput(firstName, 'name') || !sanitizeInput(lastName, 'name')) {
+      return res.status(400).json({ error: 'Invalid name format' });
+    }
 
-    console.log('[REGISTER] User created successfully:', cleanUsername);
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
 
-    return res.status(201).json({
+    // Generate username: first letter + last name
+    const username = (firstName[0] + lastName).toLowerCase();
+
+    if (!sanitizeInput(username, 'username')) {
+      return res.status(400).json({ error: 'Generated username invalid' });
+    }
+
+    // Check if user already exists
+    const existingUsers = await execSSH('pveum user list');
+    const userExists = existingUsers.includes(`${username}@pve`);
+
+    if (userExists) {
+      return res.status(409).json({ error: 'User already exists' });
+    }
+
+    // Create Proxmox user
+    const createUserCmd = `pveum user add ${username}@pve --password "${password}" --firstname "${firstName}" --lastname "${lastName}"`;
+    await execSSH(createUserCmd);
+
+    return res.status(200).json({
       success: true,
-      username: cleanUsername,
-      message: 'Registration successful! You can now log in.'
+      username,
+      message: 'Account created successfully',
     });
-
   } catch (error) {
-    console.error('[REGISTER ERROR]', error);
-    return res.status(500).json({ 
-      error: 'Registration failed. Please try again.' 
+    console.error('Registration error:', error);
+    return res.status(500).json({
+      error: 'Registration failed',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }
 }
-
