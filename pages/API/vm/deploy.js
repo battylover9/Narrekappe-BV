@@ -1,120 +1,93 @@
-// pages/api/vm/deploy.js
-// UPDATED: Uses qcow2 templates from local Proxmox storage
-
 import { execSSH } from '../../../lib/proxmoxApi';
+
+// Input sanitization
+function sanitizeInput(input, type = 'alphanumeric') {
+  const patterns = {
+    alphanumeric: /^[a-zA-Z0-9_-]+$/,
+    username: /^[a-z][a-z0-9_-]{2,31}$/,
+  };
+
+  if (!patterns[type] || !patterns[type].test(input)) {
+    return false;
+  }
+  return true;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { vmName, userName } = req.body;
-
-  if (!vmName || !userName) {
-    return res.status(400).json({ error: 'vmName and userName are required' });
-  }
-
   try {
-    const TEMPLATE_DIR = '/var/lib/vz/template/qemu';
-    const STORAGE = 'local-lvm';
-    const MEMORY = '2048';
-    const CORES = '2';
-    const NETWORK = 'virtio,bridge=vmbr1'; // Isolated network for vulnerable VMs
+    const { vmName, userName } = req.body;
 
-    console.log(`[DEPLOY] User ${userName} requesting ${vmName}`);
+    // Validate inputs
+    if (!vmName || !userName) {
+      return res.status(400).json({ error: 'VM name and username required' });
+    }
 
-    // Check if template exists
-    const diskPath = `${TEMPLATE_DIR}/${vmName}-disk0.qcow2`;
-    try {
-      await execSSH(`test -f "${diskPath}"`);
-    } catch {
-      return res.status(404).json({ 
-        error: `VM template '${vmName}' not found. Has it been converted from OVA?` 
+    if (!sanitizeInput(vmName, 'alphanumeric') || !sanitizeInput(userName, 'username')) {
+      return res.status(400).json({ error: 'Invalid input format' });
+    }
+
+    console.log(`[DEPLOY] User ${userName} deploying ${vmName}`);
+
+    // Check if user already has this VM type
+    const existingVMs = await execSSH('qm list');
+    const newVMName = `${vmName}-${userName}`;
+    
+    if (existingVMs.includes(newVMName)) {
+      return res.status(409).json({ 
+        success: false,
+        error: `You already have a ${vmName} VM deployed` 
       });
     }
 
-    // Check if user already has an active VM
-    try {
-      const activeVMs = await execSSH(`qm list | grep "${userName}" || true`);
-      if (activeVMs.trim()) {
-        const vmid = activeVMs.trim().split(/\s+/)[0];
-        return res.status(400).json({
-          error: 'You already have an active VM. Please stop it before starting a new one.',
-          activeVMID: parseInt(vmid)
-        });
-      }
-    } catch {}
+    // Find the template VMID
+    const templateMap = {
+      'chronos': '9000',
+      'jangow': '9001'
+    };
 
-    // Find next available VM ID
-    const vmListOutput = await execSSH('qm list | awk \'NR>1 {print $1}\' | sort -n | tail -1 || echo 100');
-    const lastVmId = parseInt(vmListOutput.trim()) || 100;
-    const newVmId = lastVmId + 1;
-
-    const vmDisplayName = `${vmName}-${userName}`;
-
-    console.log(`[DEPLOY] Creating VM ${newVmId}...`);
-
-    // Create VM
-    await execSSH(`qm create ${newVmId} \
-      --name "${vmDisplayName}" \
-      --memory ${MEMORY} \
-      --cores ${CORES} \
-      --net0 ${NETWORK} \
-      --scsihw virtio-scsi-pci \
-      --description "Deployed for: ${userName} on $(date +%Y-%m-%d_%H:%M:%S)"`);
-
-    // Import disk from template
-    console.log(`[DEPLOY] Importing disk...`);
-    await execSSH(`qm importdisk ${newVmId} "${diskPath}" ${STORAGE}`);
-
-    // Attach disk and configure boot
-    console.log(`[DEPLOY] Configuring boot...`);
-    await execSSH(`qm set ${newVmId} --scsi0 ${STORAGE}:vm-${newVmId}-disk-0`);
-    await execSSH(`qm set ${newVmId} --boot order=scsi0`);
-    await execSSH(`qm set ${newVmId} --vga std`);
-
-    // Start VM
-    console.log(`[DEPLOY] Starting VM ${newVmId}...`);
-    await execSSH(`qm start ${newVmId}`);
-
-    // Wait for IP address (try for 60 seconds)
-    let ipAddress = null;
-    for (let i = 0; i < 12; i++) {
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      
-      try {
-        const configOutput = await execSSH(`qm config ${newVmId}`);
-        const macMatch = configOutput.match(/virtio=([0-9A-Fa-f:]+)/);
-        
-        if (macMatch) {
-          const mac = macMatch[1];
-          const arpOutput = await execSSH(`arp -n | grep -i "${mac}" || true`);
-          const ipMatch = arpOutput.match(/(\d+\.\d+\.\d+\.\d+)/);
-          
-          if (ipMatch) {
-            ipAddress = ipMatch[1];
-            break;
-          }
-        }
-      } catch {}
+    const templateId = templateMap[vmName];
+    if (!templateId) {
+      return res.status(400).json({ error: 'Invalid VM template' });
     }
 
-    console.log(`[DEPLOY] VM ${newVmId} deployed successfully`);
+    // Find next available VM ID (start from 2000 for student VMs)
+    const vmids = existingVMs.match(/\d+/g) || [];
+    let nextId = 2000;
+    while (vmids.includes(String(nextId))) {
+      nextId++;
+    }
 
-    res.status(200).json({
+    console.log(`[DEPLOY] Cloning template ${templateId} to VM ${nextId} with name ${newVMName}`);
+
+    // Clone the template with user-specific name
+    const cloneCmd = `qm clone ${templateId} ${nextId} --name "${newVMName}" --full`;
+    await execSSH(cloneCmd);
+
+    console.log(`[DEPLOY] Starting VM ${nextId}`);
+
+    // Start the VM
+    await execSSH(`qm start ${nextId}`);
+
+    console.log(`[DEPLOY] Successfully deployed ${newVMName} (${nextId})`);
+
+    return res.status(200).json({
       success: true,
-      vmId: newVmId,
-      vmName: vmDisplayName,
-      ipAddress: ipAddress || 'Waiting for network... Check Proxmox console',
-      message: 'VM deployed successfully! Wait 1-2 minutes for full boot.',
-      expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
+      vmid: nextId,
+      vmName: newVMName,
+      status: 'running',
+      message: 'VM deployed successfully'
     });
 
   } catch (error) {
-    console.error('[DEPLOY ERROR]', error);
-    res.status(500).json({
-      error: 'Failed to deploy VM',
-      details: error.message
+    console.error('[DEPLOY] Error:', error);
+    return res.status(500).json({ 
+      success: false,
+      error: 'Deployment failed',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 }
