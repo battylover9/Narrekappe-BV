@@ -10,26 +10,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get all VMs with detailed stats
     const { stdout: resourceStats } = await execPromise(
       'pvesh get /cluster/resources --type vm --output-format json'
     ).catch(() => ({ stdout: '[]' }));
     
     const vms = JSON.parse(resourceStats || '[]');
 
-    // Calculate totals
     const totalVMs = vms.length;
     const runningVMs = vms.filter(vm => vm.status === 'running').length;
     const stoppedVMs = vms.filter(vm => vm.status === 'stopped').length;
     
-    // Calculate resource usage
     const totalCPUUsage = vms.reduce((sum, vm) => sum + (vm.cpu || 0), 0);
     const totalMemUsed = vms.reduce((sum, vm) => sum + (vm.mem || 0), 0);
     const totalMemMax = vms.reduce((sum, vm) => sum + (vm.maxmem || 0), 0);
     const totalDiskUsed = vms.reduce((sum, vm) => sum + (vm.disk || 0), 0);
     const totalDiskMax = vms.reduce((sum, vm) => sum + (vm.maxdisk || 0), 0);
 
-    // Get deployment log if exists
     let recentDeployments = [];
     try {
       if (fs.existsSync('/var/log/vm-deployments.log')) {
@@ -52,7 +48,6 @@ export default async function handler(req, res) {
       console.log('Could not read deployment log:', err.message);
     }
 
-    // Format VM details
     const vmDetails = vms.map(vm => ({
       vmid: vm.vmid,
       name: vm.name || 'Unknown',

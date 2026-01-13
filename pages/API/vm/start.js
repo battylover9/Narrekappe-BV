@@ -1,5 +1,3 @@
-// pages/api/vm/start.js
-// UPDATED: Uses SSH instead of local exec
 
 import { execSSH } from '../../../lib/proxmoxApi';
 
@@ -16,20 +14,20 @@ export default async function handler(req, res) {
 
   try {
     console.log(`[START] Starting VM ${vmId}...`);
-    
+
     await execSSH(`qm start ${vmId}`);
-    
+
     console.log(`[START] VM ${vmId} started`);
-    
-    res.status(200).json({ 
-      success: true, 
-      message: `VM ${vmId} started` 
+
+    res.status(200).json({
+      success: true,
+      message: `VM ${vmId} started`
     });
   } catch (error) {
     console.error('[START ERROR]', error);
-    res.status(500).json({ 
-      error: 'Failed to start VM', 
-      details: error.message 
+    res.status(500).json({
+      error: 'Failed to start VM',
+      details: error.message
     });
   }
 }

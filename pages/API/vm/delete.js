@@ -1,6 +1,3 @@
-// pages/api/vm/delete.js
-// UPDATED: Uses SSH instead of local exec
-
 import { execSSH } from '../../../lib/proxmoxApi';
 
 export default async function handler(req, res) {
@@ -17,7 +14,6 @@ export default async function handler(req, res) {
   try {
     console.log(`[DELETE] Deleting VM ${vmId}...`);
 
-    // Stop VM first
     try {
       await execSSH(`qm stop ${vmId}`);
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -25,20 +21,19 @@ export default async function handler(req, res) {
       console.log(`[DELETE] VM ${vmId} stop error:`, stopError.message);
     }
 
-    // Destroy VM completely
     await execSSH(`qm destroy ${vmId} --purge`);
-    
+
     console.log(`[DELETE] VM ${vmId} deleted`);
-    
-    res.status(200).json({ 
-      success: true, 
-      message: `VM ${vmId} deleted` 
+
+    res.status(200).json({
+      success: true,
+      message: `VM ${vmId} deleted`
     });
   } catch (error) {
     console.error('[DELETE ERROR]', error);
-    res.status(500).json({ 
-      error: 'Failed to delete VM', 
-      details: error.message 
+    res.status(500).json({
+      error: 'Failed to delete VM',
+      details: error.message
     });
   }
 }

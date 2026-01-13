@@ -1,4 +1,3 @@
-// app/admin-dashboard/page.js
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,7 +5,6 @@ import { useRouter } from 'next/navigation';
 export default function AdminDashboardPage() {
   const router = useRouter();
 
-  // Mimic the old localStorage auth check
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (localStorage.getItem('loggedIn') !== 'yes') {

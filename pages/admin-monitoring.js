@@ -109,8 +109,6 @@ export default function AdminMonitoringPage() {
             </button>
           </div>
         </div>
-
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="card">
             <h3 className="text-sm muted mb-2">Total VMs</h3>
@@ -152,8 +150,6 @@ export default function AdminMonitoringPage() {
             </p>
           </div>
         </div>
-
-        {/* Recent Deployments */}
         {stats?.recentDeployments && stats.recentDeployments.length > 0 && (
           <div className="card mb-8">
             <h2 className="text-2xl font-bold mb-4">Recent Deployments</h2>
@@ -184,7 +180,7 @@ export default function AdminMonitoringPage() {
           </div>
         )}
 
-        {/* VM Details Table */}
+
         <div className="card">
           <h2 className="text-2xl font-bold mb-4">All Virtual Machines</h2>
           
@@ -241,8 +237,6 @@ export default function AdminMonitoringPage() {
             </div>
           )}
         </div>
-
-        {/* Resource Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <div className="card">
             <h3 className="text-xl font-bold mb-4">Memory Overview</h3>

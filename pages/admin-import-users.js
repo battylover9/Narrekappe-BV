@@ -97,7 +97,6 @@ export default function AdminImportUsersPage() {
         <h1 className="text-4xl font-bold mb-2">Import Users</h1>
         <p className="muted mb-6">Bulk import students from CSV file</p>
 
-        {/* Instructions Card */}
         <div className="card mb-6">
           <h2 className="text-2xl font-bold mb-4">Instructions</h2>
           
@@ -129,7 +128,6 @@ export default function AdminImportUsersPage() {
           </div>
         </div>
 
-        {/* Upload Card */}
         <div className="card mb-6">
           <h2 className="text-2xl font-bold mb-4">Upload CSV</h2>
 
@@ -178,7 +176,6 @@ export default function AdminImportUsersPage() {
           </div>
         </div>
 
-        {/* Results Card */}
         {results && (
           <div className="card">
             <h2 className="text-2xl font-bold mb-4">Import Results</h2>

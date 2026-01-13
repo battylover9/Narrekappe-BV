@@ -22,11 +22,9 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Save admin session
         localStorage.setItem('adminAuth', 'true');
         localStorage.setItem('adminUser', username);
         
-        // Redirect to admin dashboard
         window.location.href = '/admin-main';
       } else {
         setError(data.error || 'Invalid credentials');
@@ -99,14 +97,6 @@ export default function AdminLoginPage() {
                 {loading ? 'Logging in...' : 'Login'}
               </button>
             </form>
-
-            <div className="mt-4 p-3 bg-gray-100 rounded">
-              <p className="text-sm text-gray-600">
-                <strong>Default credentials:</strong><br />
-                Username: admin<br />
-                Password: Admin123!
-              </p>
-            </div>
           </div>
         </div>
       </main>

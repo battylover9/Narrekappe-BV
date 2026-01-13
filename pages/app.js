@@ -1,12 +1,6 @@
-// public/app.js
-// Narrekappe front-end helpers & placeholder APIs
 
 (function () {
   if (typeof window === 'undefined') return;
-
-  //
-  // LOGIN SYSTEM (front-end mock until real backend exists)
-  //
 
   function handleLogin(role) {
     const user =
@@ -19,7 +13,6 @@
       return false;
     }
 
-    // Admin login
     if (role === 'admin') {
       if (user === 'admin' && pass === 'admin123') {
         window.location.href = '/admin-dashboard';
@@ -28,8 +21,6 @@
       }
       return false;
     }
-
-    // Student login
     if (role === 'student') {
       if (pass.length >= 4) {
         window.location.href = '/student-dash';
@@ -40,22 +31,13 @@
     }
   }
 
-  // Expose if you ever use onclick="handleLogin('admin')" in markup
   window.handleLogin = handleLogin;
-
-  //
-  // PROXMOX API PLACEHOLDERS
-  // (these hit Next.js API routes under /api/proxmox/...)
-  //
-
-  // Get list of VMs (from S3/Proxmox helper)
   async function api_getProxmoxVMs() {
     return fetch('/api/vms')
       .then((res) => res.json())
       .catch((err) => console.error('Proxmox VM fetch failed:', err));
   }
 
-  // Start VM
   async function api_startProxmoxVM(vmid) {
     return fetch(`/api/proxmox/vm/${vmid}/start`, {
       method: 'POST',
@@ -64,7 +46,6 @@
       .catch((err) => console.error('Proxmox start failed:', err));
   }
 
-  // Stop VM
   async function api_stopProxmoxVM(vmid) {
     return fetch(`/api/proxmox/vm/${vmid}/stop`, {
       method: 'POST',
@@ -72,10 +53,6 @@
       .then((res) => res.json())
       .catch((err) => console.error('Proxmox stop failed:', err));
   }
-
-  //
-  // VMWARE API PLACEHOLDERS
-  //
 
   async function api_getVMwareVMs() {
     return fetch('/api/vmware/vms')
@@ -95,10 +72,6 @@
       .catch((err) => console.error('VMware power off failed:', err));
   }
 
-  //
-  // VulnHub import placeholder (kept as-is for when you implement it)
-  //
-
   async function api_downloadVulnHubMachine(url) {
     return fetch('/api/vulnhub/import', {
       method: 'POST',
@@ -108,10 +81,6 @@
       .then((res) => res.json())
       .catch((err) => console.error('VulnHub import failed:', err));
   }
-
-  //
-  // Helper: build a VM card block
-  //
 
   function createVMCard(vm) {
     return `
@@ -124,9 +93,6 @@
     `;
   }
 
-  //
-  // Admin login form using localStorage "users"
-  //
 
   function initLoginForm() {
     const form = document.getElementById('loginForm');
@@ -156,10 +122,6 @@
     });
   }
 
-  //
-  // Load Proxmox VMs into admin dashboard container
-  //
-
   async function loadProxmoxVMsIntoDashboard() {
     const container = document.querySelector('#vm-container');
     if (!container) return;
@@ -169,11 +131,6 @@
 
     container.innerHTML = vms.map((vm) => createVMCard(vm)).join('');
   }
-
-  //
-  // LocalStorage user management
-  //
-
   function ensureDefaultUsers() {
     if (!localStorage.getItem('users')) {
       const defaultUsers = [
@@ -197,7 +154,6 @@
     alert('User created successfully!');
   }
 
-  // export some helpers for inline onclick/onload, if you ever need them
   window.api_getProxmoxVMs = api_getProxmoxVMs;
   window.api_startProxmoxVM = api_startProxmoxVM;
   window.api_stopProxmoxVM = api_stopProxmoxVM;
@@ -205,7 +161,6 @@
   window.addUser = addUser;
   window.api_downloadVulnHubMachine = api_downloadVulnHubMachine;
 
-  // Init once DOM is ready
   window.addEventListener('DOMContentLoaded', () => {
     ensureDefaultUsers();
     initLoginForm();

@@ -20,7 +20,6 @@ export default function SiteMapPage() {
         <h1 className="text-4xl font-bold mb-8">Site Navigation</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Student Section */}
           <div className="card">
             <h2 className="text-2xl font-bold mb-4 text-narrek-accent">For Students</h2>
             <ul className="space-y-3">
@@ -44,8 +43,6 @@ export default function SiteMapPage() {
               </li>
             </ul>
           </div>
-
-          {/* Admin Section */}
           <div className="card">
             <h2 className="text-2xl font-bold mb-4 text-narrek-accent-2">For Administrators</h2>
             <ul className="space-y-3">
@@ -63,8 +60,6 @@ export default function SiteMapPage() {
               </li>
             </ul>
           </div>
-
-          {/* Information Section */}
           <div className="card">
             <h2 className="text-2xl font-bold mb-4">Information</h2>
             <ul className="space-y-3">
@@ -82,8 +77,6 @@ export default function SiteMapPage() {
               </li>
             </ul>
           </div>
-
-          {/* API Endpoints */}
           <div className="card">
             <h2 className="text-2xl font-bold mb-4">API Endpoints</h2>
             <ul className="space-y-2 text-sm font-mono">
@@ -125,7 +118,6 @@ export default function SiteMapPage() {
           </div>
         </div>
       </main>
-
       <footer className="site-footer">
         <div className="footer-inner">
           <p>© 2025 Narrekappe B.V. – Cybersecurity Training Platform</p>

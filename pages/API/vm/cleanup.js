@@ -1,15 +1,10 @@
-// pages/api/vm/cleanup.js
-// Automated cleanup of expired VMs
-
 import { cleanupExpiredVMs } from '../../../lib/proxmoxApi';
 
 export default async function handler(req, res) {
-  // Only allow POST or GET for manual trigger
   if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Simple token-based authentication for automated calls
   const authToken = req.headers['x-cleanup-token'] || req.query.token;
   const expectedToken = process.env.CLEANUP_TOKEN || 'change-me-in-production';
 

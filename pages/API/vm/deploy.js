@@ -1,93 +1,56 @@
 import { execSSH } from '../../../lib/proxmoxApi';
 
-// Input sanitization
-function sanitizeInput(input, type = 'alphanumeric') {
-  const patterns = {
-    alphanumeric: /^[a-zA-Z0-9_-]+$/,
-    username: /^[a-z][a-z0-9_-]{2,31}$/,
-  };
-
-  if (!patterns[type] || !patterns[type].test(input)) {
-    return false;
-  }
-  return true;
-}
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const { vmName, userName } = req.body;
+
+  console.log('[DEPLOY] Request:', { vmName, userName });
+
   try {
-    const { vmName, userName } = req.body;
+    // Simple sanitization
+    const cleanVmName = vmName.replace(/[^a-zA-Z0-9_-]/g, '');
+    const cleanUserName = userName.replace(/[^a-zA-Z0-9_-]/g, '');
 
-    // Validate inputs
-    if (!vmName || !userName) {
-      return res.status(400).json({ error: 'VM name and username required' });
-    }
+    const diskPath = `/var/lib/vz/template/qemu/${cleanVmName}-disk0.qcow2`;
 
-    if (!sanitizeInput(vmName, 'alphanumeric') || !sanitizeInput(userName, 'username')) {
-      return res.status(400).json({ error: 'Invalid input format' });
-    }
+    console.log('[DEPLOY] Checking template:', diskPath);
+    await execSSH(`test -f "${diskPath}"`);
 
-    console.log(`[DEPLOY] User ${userName} deploying ${vmName}`);
+    console.log('[DEPLOY] Getting VM ID...');
+    const vmList = await execSSH('qm list | tail -n +2 | awk \'{print $1}\' | sort -n | tail -1');
+    const nextId = (parseInt(vmList.trim()) || 100) + 1;
 
-    // Check if user already has this VM type
-    const existingVMs = await execSSH('qm list');
-    const newVMName = `${vmName}-${userName}`;
-    
-    if (existingVMs.includes(newVMName)) {
-      return res.status(409).json({ 
-        success: false,
-        error: `You already have a ${vmName} VM deployed` 
-      });
-    }
+    console.log('[DEPLOY] Creating VM', nextId);
+    const vmName2 = `${cleanVmName}-${cleanUserName}`;
 
-    // Find the template VMID
-    const templateMap = {
-      'chronos': '9000',
-      'jangow': '9001'
-    };
+    await execSSH(`qm create ${nextId} --name "${vmName2}" --memory 2048 --cores 2 --net0 virtio,bridge=vmbr1`);
 
-    const templateId = templateMap[vmName];
-    if (!templateId) {
-      return res.status(400).json({ error: 'Invalid VM template' });
-    }
+    console.log('[DEPLOY] Importing disk...');
+    await execSSH(`qm importdisk ${nextId} "${diskPath}" local-lvm`, { timeout: 120000 });
 
-    // Find next available VM ID (start from 2000 for student VMs)
-    const vmids = existingVMs.match(/\d+/g) || [];
-    let nextId = 2000;
-    while (vmids.includes(String(nextId))) {
-      nextId++;
-    }
+    console.log('[DEPLOY] Configuring...');
+    await execSSH(`qm set ${nextId} --scsi0 local-lvm:vm-${nextId}-disk-0`);
+    await execSSH(`qm set ${nextId} --boot order=scsi0`);
 
-    console.log(`[DEPLOY] Cloning template ${templateId} to VM ${nextId} with name ${newVMName}`);
-
-    // Clone the template with user-specific name
-    const cloneCmd = `qm clone ${templateId} ${nextId} --name "${newVMName}" --full`;
-    await execSSH(cloneCmd);
-
-    console.log(`[DEPLOY] Starting VM ${nextId}`);
-
-    // Start the VM
+    console.log('[DEPLOY] Starting...');
     await execSSH(`qm start ${nextId}`);
 
-    console.log(`[DEPLOY] Successfully deployed ${newVMName} (${nextId})`);
+    console.log('[DEPLOY] Complete!');
 
     return res.status(200).json({
       success: true,
-      vmid: nextId,
-      vmName: newVMName,
-      status: 'running',
-      message: 'VM deployed successfully'
+      vmId: nextId,
+      vmName: vmName2,
+      message: 'VM deployed!'
     });
 
   } catch (error) {
-    console.error('[DEPLOY] Error:', error);
-    return res.status(500).json({ 
-      success: false,
-      error: 'Deployment failed',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    console.error('[DEPLOY ERROR]', error.message);
+    return res.status(500).json({
+      error: error.message
     });
   }
 }

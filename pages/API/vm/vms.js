@@ -1,9 +1,5 @@
-// pages/api/vm/vms.js
-// UPDATED: Lists qcow2 templates from local Proxmox storage
-
 import { execSSH } from '../../../lib/proxmoxApi';
 
-// VM metadata
 const VM_INFO = {
   'chronos': {
     displayName: 'Chronos',
@@ -35,10 +31,9 @@ export default async function handler(req, res) {
 
   try {
     const TEMPLATE_DIR = '/var/lib/vz/template/qemu';
-    
+
     console.log('[VMS] Listing available templates...');
-    
-    // List all qcow2 templates
+
     let output;
     try {
       output = await execSSH(`ls -lh ${TEMPLATE_DIR}/*-disk0.qcow2 2>/dev/null || echo ""`);
@@ -62,11 +57,9 @@ export default async function handler(req, res) {
       const size = parts[4];
       const filePath = parts.slice(8).join(' ');
       const fileName = filePath.split('/').pop();
-      
-      // Extract VM name (e.g., "chronos-disk0.qcow2" -> "chronos")
+
       const vmName = fileName.replace('-disk0.qcow2', '');
 
-      // Get metadata
       const info = VM_INFO[vmName] || {
         displayName: vmName.charAt(0).toUpperCase() + vmName.slice(1).replace(/-/g, ' '),
         difficulty: 'Unknown',
@@ -93,9 +86,9 @@ export default async function handler(req, res) {
     res.status(200).json({ vms });
   } catch (error) {
     console.error('[VMS ERROR]', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to list VMs',
-      details: error.message 
+      details: error.message
     });
   }
 }
