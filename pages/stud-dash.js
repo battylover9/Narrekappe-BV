@@ -328,7 +328,7 @@ const deployVM = async (vmName) => {
                             </button>
                           )}
                           <a
-                            href={`https://192.168.205.30:8006/?console=kvm&novnc=1&vmid=${d.vmid}&node=pve&resize=off&cmd=`}
+                            href={`https://192.168.205.30:8006/?console=kvm&novnc=1&vmid=${d.vmid}&node=pverack5`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-sm btn-success"
